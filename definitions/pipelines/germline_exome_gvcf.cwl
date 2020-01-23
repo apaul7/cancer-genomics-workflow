@@ -56,20 +56,6 @@ inputs:
             items:
                 type: array
                 items: string
-    vep_cache_dir:
-        type: string
-    vep_ensembl_assembly:
-        type: string
-        doc: "genome assembly to use in vep. Examples: GRCh38 or GRCm38"
-    vep_ensembl_version:
-        type: string
-        doc: "ensembl version - Must be present in the cache directory. Example: 95"
-    vep_ensembl_species:
-        type: string
-        doc: "ensembl species - Must be present in the cache directory. Examples: homo_sapiens or mus_musculus"
-    vep_plugins:
-        type: string[]?
-        doc: "array of plugins to use when running vep"
     synonyms_file:
         type: File?
     annotate_coding_only:
@@ -78,9 +64,6 @@ inputs:
         type: int?
     qc_minimum_base_quality:
         type: int?
-    vep_custom_annotations:
-        type: ../types/vep_custom_annotation.yml#vep_custom_annotation[]
-        doc: "custom type, check types directory for input format"
     variants_to_table_fields:
          type: string[]?
     variants_to_table_genotype_fields:
