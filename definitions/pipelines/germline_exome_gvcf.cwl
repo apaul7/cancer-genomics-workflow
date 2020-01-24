@@ -16,6 +16,8 @@ inputs:
             - string
             - File
         secondaryFiles: [.fai, ^.dict, .amb, .ann, .bwt, .pac, .sa]
+    sample_name:
+        type: string
     sequence:
         type: ../types/sequence_data.yml#sequence_data[]
     mills:
@@ -149,7 +151,11 @@ steps:
          run: ../tools/gatherer.cwl
          in:
             output_dir:
-                default: "outs"
+                source: sample_name
+                valueFrom: |
+                  ${
+                    return self + "-outs";
+                  }
             all_files:
                 source: [index_cram/indexed_cram, alignment_and_qc/mark_duplicates_metrics, alignment_and_qc/insert_size_metrics, alignment_and_qc/insert_size_histogram, alignment_and_qc/alignment_summary_metrics, alignment_and_qc/hs_metrics, alignment_and_qc/per_target_coverage_metrics, alignment_and_qc/per_target_hs_metrics, alignment_and_qc/per_base_coverage_metrics, alignment_and_qc/per_base_hs_metrics, alignment_and_qc/summary_hs_metrics, alignment_and_qc/flagstats, alignment_and_qc/verify_bam_id_metrics, alignment_and_qc/verify_bam_id_depth, haplotype_caller/gvcf]
                 valueFrom: ${
@@ -177,4 +183,4 @@ steps:
                                 }
                                 return all_files;
                             }
-        out: [gathered_files]
+         out: [gathered_files]
