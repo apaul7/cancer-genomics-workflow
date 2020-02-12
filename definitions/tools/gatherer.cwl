@@ -2,7 +2,6 @@
 
 cwlVersion: v1.0
 class: CommandLineTool
-baseCommand: ['/bin/cp']
 
 requirements:
     - class: ShellCommandRequirement
@@ -10,8 +9,12 @@ requirements:
       dockerPull: "ubuntu:xenial"
     - class: ResourceRequirement
       ramMin: 4000
+    - class: InitialWorkDirRequirement
+      listing:
+      - class: Directory
+        basename: "$(inputs.output_dir)"
 
-arguments: ["-t"]
+arguments: ["mkdir", "$(inputs.output_dir)", { shellQuote: false, valueFrom: "&&" }, "/bin/cp", "--archive", "--target-directory"]
 
 inputs:
     output_dir:
@@ -19,24 +22,11 @@ inputs:
         inputBinding:
             position: 1
     all_files:
-        type: File[] 
+        type: File[]
         inputBinding:
             position: 2
 outputs:
     gathered_files:
-        type:
-            type: array
-            items: string
+        type: Directory
         outputBinding:
-            outputEval: ${
-                            var file_paths = [];
-                            var new_path = inputs.output_dir;
-                            if (new_path.slice(-1) != "/") {
-                                new_path += "/";
-                            }
-                            var arrLen = inputs.all_files.length;
-                            for(var i = 0; i < arrLen; i++) {
-                                file_paths.push(new_path + inputs.all_files[i].basename);
-                            }
-                            return file_paths;
-                        }
+            glob: "$(inputs.output_dir)"
