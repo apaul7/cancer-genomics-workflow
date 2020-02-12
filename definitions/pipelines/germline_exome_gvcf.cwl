@@ -58,18 +58,10 @@ inputs:
             items:
                 type: array
                 items: string
-    annotate_coding_only:
-        type: boolean?
     qc_minimum_mapping_quality:
         type: int?
     qc_minimum_base_quality:
         type: int?
-    variants_to_table_fields:
-         type: string[]?
-    variants_to_table_genotype_fields:
-         type: string[]?
-    vep_to_table_fields:
-         type: string[]?
 outputs:
     gathered_directory:
         type: Directory
