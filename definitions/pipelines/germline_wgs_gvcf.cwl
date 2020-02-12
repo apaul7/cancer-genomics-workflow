@@ -52,9 +52,9 @@ inputs:
         type: File
     bqsr_intervals:
         type: string[]?
-    minimum_mapping_quality:
+    qc_minimum_mapping_quality:
         type: int?
-    minimum_base_quality:
+    qc_minimum_base_quality:
         type: int?
     per_base_intervals:
         type: ../types/labelled_file.yml#labelled_file[]
@@ -79,8 +79,8 @@ steps:
             intervals: qc_intervals
             picard_metric_accumulation_level: picard_metric_accumulation_level
             bqsr_intervals: bqsr_intervals
-            minimum_mapping_quality: minimum_mapping_quality
-            minimum_base_quality: minimum_base_quality
+            minimum_mapping_quality: qc_minimum_mapping_quality
+            minimum_base_quality: qc_minimum_base_quality
             per_base_intervals: per_base_intervals
             per_target_intervals: per_target_intervals
             summary_intervals: summary_intervals
