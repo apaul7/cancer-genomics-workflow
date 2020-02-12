@@ -18,6 +18,8 @@ inputs:
         secondaryFiles: [.fai, ^.dict, .amb, .ann, .bwt, .pac, .sa]
     sequence:
         type: ../types/sequence_data.yml#sequence_data[]
+    sample_name:
+        type: string
     mills:
         type: File
         secondaryFiles: [.tbi]
@@ -61,60 +63,9 @@ inputs:
     summary_intervals:
         type: ../types/labelled_file.yml#labelled_file[]
 outputs:
-    cram:
-        type: File
-        outputSource: index_cram/indexed_cram
-    mark_duplicates_metrics:
-        type: File
-        outputSource: alignment_and_qc/mark_duplicates_metrics
-    insert_size_metrics:
-        type: File
-        outputSource: alignment_and_qc/insert_size_metrics
-    insert_size_histogram:
-        type: File
-        outputSource: alignment_and_qc/insert_size_histogram
-    alignment_summary_metrics:
-        type: File
-        outputSource: alignment_and_qc/alignment_summary_metrics
-    gc_bias_metrics:
-        type: File
-        outputSource: alignment_and_qc/gc_bias_metrics
-    gc_bias_metrics_chart:
-        type: File
-        outputSource: alignment_and_qc/gc_bias_metrics_chart
-    gc_bias_metrics_summary:
-        type: File
-        outputSource: alignment_and_qc/gc_bias_metrics_summary
-    wgs_metrics:
-        type: File
-        outputSource: alignment_and_qc/wgs_metrics
-    flagstats:
-        type: File
-        outputSource: alignment_and_qc/flagstats
-    verify_bam_id_metrics:
-        type: File
-        outputSource: alignment_and_qc/verify_bam_id_metrics
-    verify_bam_id_depth:
-        type: File
-        outputSource: alignment_and_qc/verify_bam_id_depth
-    gvcf:
-        type: File[]
-        outputSource: haplotype_caller/gvcf
-    per_base_coverage_metrics:
-        type: File[]
-        outputSource: alignment_and_qc/per_base_coverage_metrics
-    per_base_hs_metrics:
-        type: File[]
-        outputSource: alignment_and_qc/per_base_hs_metrics
-    per_target_coverage_metrics:
-        type: File[]
-        outputSource: alignment_and_qc/per_target_coverage_metrics
-    per_target_hs_metrics:
-        type: File[]
-        outputSource: alignment_and_qc/per_target_hs_metrics
-    summary_hs_metrics:
-        type: File[]
-        outputSource: alignment_and_qc/summary_hs_metrics
+    gathered_files:
+        type: Directory
+        outputSource: gather_step/gathered_files
 steps:
     alignment_and_qc:
         run: alignment_wgs.cwl
@@ -185,3 +136,40 @@ steps:
             cram: bam_to_cram/cram
          out:
             [indexed_cram]
+    gather_step:
+         run: ../tools/gatherer.cwl
+         in:
+            output_dir:
+                source: sample_name
+                valueFrom: |
+                  ${
+                    return self + "-outs";
+                  }
+            all_files:
+                source: [alignment_and_qc/mark_duplicates_metrics, alignment_and_qc/insert_size_metrics, alignment_and_qc/insert_size_histogram, alignment_and_qc/alignment_summary_metrics, alignment_and_qc/gc_bias_metrics, alignment_and_qc/gc_bias_metrics_chart, alignment_and_qc/gc_bias_metrics_summary, alignment_and_qc/wgs_metrics, alignment_and_qc/flagstats, alignment_and_qc/verify_bam_id_metrics, alignment_and_qc/verify_bam_id_depth, alignment_and_qc/per_base_coverage_metrics, alignment_and_qc/per_base_hs_metrics, alignment_and_qc/per_target_coverage_metrics, alignment_and_qc/per_target_hs_metrics, alignment_and_qc/summary_hs_metrics, haplotype_caller/gvcf, index_cram/indexed_cram]
+                valueFrom: ${
+                                function flatten(inArr, outArr) {
+                                    var arrLen = inArr.length;
+                                    for (var i = 0; i < arrLen; i++) {
+                                        if (Array.isArray(inArr[i])) {
+                                            flatten(inArr[i], outArr);
+                                        }
+                                        else {
+                                            outArr.push(inArr[i]);
+                                        }
+                                    }
+                                    return outArr;
+                                }
+                                var no_secondaries = flatten(self, []);
+                                var all_files = [];
+                                var arrLen = no_secondaries.length;
+                                for (var i = 0; i < arrLen; i++) {
+                                    all_files.push(no_secondaries[i]);
+                                    var secondaryLen = no_secondaries[i].secondaryFiles.length;
+                                    for (var j = 0; j < secondaryLen; j++) {
+                                        all_files.push(no_secondaries[i].secondaryFiles[j]);
+                                    }
+                                }
+                                return all_files;
+                            }
+         out: [gathered_files]
