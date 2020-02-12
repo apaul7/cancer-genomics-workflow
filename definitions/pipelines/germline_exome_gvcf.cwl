@@ -58,8 +58,6 @@ inputs:
             items:
                 type: array
                 items: string
-    synonyms_file:
-        type: File?
     annotate_coding_only:
         type: boolean?
     qc_minimum_mapping_quality:
