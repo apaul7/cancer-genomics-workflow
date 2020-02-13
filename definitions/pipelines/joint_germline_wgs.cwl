@@ -53,28 +53,6 @@ inputs:
                 items: string
     qc_intervals:
         type: File
-    variant_reporting_intervals:
-        type: File
-    vep_cache_dir:
-        type:
-            - string
-            - Directory
-    vep_ensembl_assembly:
-        type: string
-        doc: "genome assembly to use in vep. Examples: GRCh38 or GRCm38"
-    vep_ensembl_version:
-        type: string
-        doc: "ensembl version - Must be present in the cache directory. Example: 95"
-    vep_ensembl_species:
-        type: string
-        doc: "ensembl species - Must be present in the cache directory. Examples: homo_sapiens or mus_musculus"
-    vep_plugins:
-        type: string[]?
-        doc: "array of plugins to use when running vep"
-    synonyms_file:
-        type: File?
-    annotate_coding_only:
-        type: boolean?
     bqsr_intervals:
         type: string[]?
     minimum_mapping_quality:
@@ -87,65 +65,6 @@ inputs:
         type: ../types/labelled_file.yml#labelled_file[]
     summary_intervals:
         type: ../types/labelled_file.yml#labelled_file[]
-    vep_custom_annotations:
-        type: ../types/vep_custom_annotation.yml#vep_custom_annotation[]
-        doc: "custom type, check types directory for input format"
-    cnvkit_diagram:
-        type: boolean?
-    cnvkit_drop_low_coverage: 
-        type: boolean?
-    cnvkit_method:
-        type: string? 
-    cnvkit_reference_cnn: 
-        type: File
-    cnvkit_scatter_plot:
-        type: boolean?
-    cnvkit_male_reference:
-        type: boolean?
-    cnvkit_vcf_name:
-        type: string?
-    manta_call_regions:
-        type: File?
-        secondaryFiles: [.tbi]
-    manta_non_wgs:
-        type: boolean?
-    manta_output_contigs:
-        type: boolean?
-    smoove_exclude_regions:
-        type: File?
-    merge_max_distance:
-        type: int
-    merge_min_svs:
-        type: int
-    merge_same_type:
-        type: boolean
-    merge_same_strand:
-        type: boolean
-    merge_estimate_sv_distance:
-        type: boolean
-    merge_min_sv_size:
-        type: int
-    sv_filter_alt_abundance_percentage:
-        type: double?
-    sv_filter_paired_count:
-        type: int?
-    sv_filter_split_count:
-        type: int?
-    cnv_filter_deletion_depth:
-        type: double?
-    cnv_filter_duplication_depth:
-        type: double?
-    variants_to_table_fields:
-         type: string[]?
-    variants_to_table_genotype_fields:
-         type: string[]?
-    vep_to_table_fields:
-         type: string[]?
-    cnv_filter_min_size:
-         type: int?
-    disclaimer_text:
-        type: string?
-        default: 'Workflow source can be found at https://github.com/genome/analysis-workflows'
 outputs:
     mark_duplicates_metrics:
         type: File[]
