@@ -68,77 +68,9 @@ inputs:
     summary_intervals:
         type: ../types/labelled_file.yml#labelled_file[]
 outputs:
-    mark_duplicates_metrics:
-        type: File[]
-        outputSource: alignment_and_qc/mark_duplicates_metrics
-    insert_size_metrics:
-        type: File[]
-        outputSource: alignment_and_qc/insert_size_metrics
-    insert_size_histogram:
-        type: File[]
-        outputSource: alignment_and_qc/insert_size_histogram
-    alignment_summary_metrics:
-        type: File[]
-        outputSource: alignment_and_qc/alignment_summary_metrics
-    gc_bias_metrics:
-        type: File[]
-        outputSource: alignment_and_qc/gc_bias_metrics
-    gc_bias_metrics_chart:
-        type: File[]
-        outputSource: alignment_and_qc/gc_bias_metrics_chart
-    gc_bias_metrics_summary:
-        type: File[]
-        outputSource: alignment_and_qc/gc_bias_metrics_summary
-    wgs_metrics:
-        type: File[]
-        outputSource: alignment_and_qc/wgs_metrics
-    flagstats:
-        type: File[]
-        outputSource: alignment_and_qc/flagstats
-    verify_bam_id_metrics:
-        type: File[]
-        outputSource: alignment_and_qc/verify_bam_id_metrics
-    verify_bam_id_depth:
-        type: File[]
-        outputSource: alignment_and_qc/verify_bam_id_depth
-    per_base_coverage_metrics:
-        type:
-            type: array
-            items:
-                type: array
-                items: File
-        outputSource: alignment_and_qc/per_base_coverage_metrics
-    per_base_hs_metrics:
-        type:
-            type: array
-            items:
-                type: array
-                items: File
-        outputSource: alignment_and_qc/per_base_hs_metrics
-    per_target_coverage_metrics:
-        type:
-            type: array
-            items:
-                type: array
-                items: File
-        outputSource: alignment_and_qc/per_target_coverage_metrics
-    per_target_hs_metrics:
-        type:
-            type: array
-            items:
-                type: array
-                items: File
-        outputSource: alignment_and_qc/per_target_hs_metrics
-    summary_hs_metrics:
-        type:
-            type: array
-            items:
-                type: array
-                items: File
-        outputSource: alignment_and_qc/summary_hs_metrics
-    crams:
-        type: File[]
-        outputSource: index_cram/indexed_cram
+    per_sample_outs:
+        type: Directory[]
+        outputSource: per_sample_outputs/gathered_files
     vcf:
         type: File
         outputSource: joint_gatk/genotype_vcf
@@ -243,3 +175,30 @@ steps:
                            }
         out:
             [genotype_vcf]
+    per_sample_outputs:
+        scatter: [output_dir, all_files]
+        scatterMethod: dotproduct
+        run: ../tools/gatherer.cwl
+        in:
+            output_dir:
+                source: sample_name
+                valueFrom: |
+                  ${
+                    return self + "-outs";
+                  }
+            all_files:
+                source: [alignment_and_qc/mark_duplicates_metrics, alignment_and_qc/insert_size_metrics, alignment_and_qc/insert_size_histogram, alignment_and_qc/alignment_summary_metrics, alignment_and_qc/gc_bias_metrics, alignment_and_qc/gc_bias_metrics_chart, alignment_and_qc/gc_bias_metrics_summary, alignment_and_qc/wgs_metrics, alignment_and_qc/flagstats, alignment_and_qc/verify_bam_id_metrics, alignment_and_qc/verify_bam_id_depth, alignment_and_qc/per_base_coverage_metrics, alignment_and_qc/per_base_hs_metrics, alignment_and_qc/per_target_coverage_metrics, alignment_and_qc/per_target_hs_metrics, alignment_and_qc/summary_hs_metrics, index_cram/indexed_cram, haplotype_caller/gvcf]
+        #        linkMerge: merge_flattened
+                valueFrom: |
+                           ${
+                               var files = [];
+                               var len = self.length;
+                               for (var i = 0; i < len; i++) {
+                                   var len2 = self[i].length;
+                                   for (var j = 0; j < len2; j++) {
+                                       files.push(self[i][j]);
+                                   }
+                               }
+                               return files;
+                           }
+        out: [gathered_files]
