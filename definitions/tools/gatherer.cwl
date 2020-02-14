@@ -22,7 +22,7 @@ inputs:
         type: File[]
         inputBinding:
             position: 2
-    directories:
+    all_directories:
         type: Directory[]
         inputBinding:
             position: 3
