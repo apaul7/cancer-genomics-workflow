@@ -25,6 +25,8 @@ inputs:
             items:
                 type: array
                 items: ../types/sequence_data.yml#sequence_data
+    sample_name:
+        type: string[]
     mills:
         type: File
         secondaryFiles: [.tbi]
