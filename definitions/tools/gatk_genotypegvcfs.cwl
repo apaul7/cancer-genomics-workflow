@@ -29,6 +29,25 @@ inputs:
                 prefix: "--variant"
         inputBinding:
             position: 2
+    standard_call_confidence:
+        type: int?
+        inputBinding:
+            prefix: "--standard_min_confidence_threshold_for_calling"
+    standard_emit_confidence:
+        type: int?
+        inputBinding:
+            prefix: "--standard_min_confidence_threshold_for_emitting"
+    pedigree:
+        type: File?
+        inputBinding:
+            prefix: "--pedigree"
+    pedigree_validation_type:
+        type:
+            - "null"
+            - type: enum
+              symbols: ["STRICT", "SILENT"]
+        inputBinding:
+            prefix: "--pedigreeValidationType"
 outputs:
     genotype_vcf:
         type: File

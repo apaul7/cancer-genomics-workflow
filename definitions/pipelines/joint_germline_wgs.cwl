@@ -173,6 +173,10 @@ steps:
                                }
                                return files;
                            }
+            standard_call_confidence:
+                default: 30
+            standard_emit_confidence:
+                default: 10
         out:
             [genotype_vcf]
     per_sample_outputs:
