@@ -23,7 +23,7 @@ inputs:
         inputBinding:
             position: 2
     all_directories:
-        type: Directory[]
+        type: Directory[]?
         inputBinding:
             position: 3
 outputs:
