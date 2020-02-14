@@ -73,7 +73,8 @@ outputs:
         outputSource: per_sample_outputs/gathered_files
     vcf:
         type: File
-        outputSource: joint_gatk/genotype_vcf
+        secondaryFiles: [.tbi]
+        outputSource: gatk_filter_vcf/filtered_vcf
 steps:
     alignment_and_qc:
         scatter: [sequence]
@@ -154,7 +155,7 @@ steps:
             contamination_fraction: extract_freemix/freemix_score
         out:
             [gvcf]
-    joint_gatk:
+    run_joint_gatk:
         run: ../tools/gatk_genotypegvcfs.cwl
         in:
             reference: reference
@@ -179,6 +180,26 @@ steps:
                 default: 10
         out:
             [genotype_vcf]
+    run_vt:
+        run: ../subworkflows/vt.cwl
+        in:
+            vcf: run_joint_gatk/genotype_vcf
+            reference: reference
+        out:
+            [vt_vcf]
+    index_vt_vcf:
+        run: ../tools/index_vcf.cwl
+        in:
+            vcf: run_vt/vt_vcf
+        out:
+            [indexed_vcf]
+    gatk_filter_vcf:
+        run: ../subworkflows/gatk_filter.cwl
+        in:
+            vcf: index_vt_vcf/indexed_vcf
+            reference: reference
+        out:
+            [filtered_vcf]
     per_sample_outputs:
         scatter: [output_dir, all_files]
         scatterMethod: dotproduct
