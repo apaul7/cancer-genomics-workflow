@@ -15,6 +15,15 @@ inputs:
             - string
             - File
         secondaryFiles: [.fai]
+    filter_variant_type:
+        type: string[]?
+        default: ["INDEL", "SNP", "SYMBOLIC"]
+    filter_expression:
+        type: string[]?
+        default: ["QD < 2.0 || FS > 200.0 || ReadPosRankSum < -20.0", "QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0", "QD < 2.0 || FS > 200.0 || ReadPosRankSum < -20.0"]
+    filter_name:
+        type: string[]?
+        default: ["INDEL_filter_GATK_recommendations", "SNP_filter_GATK_recommendations", "INDEL_filter_GATK_recommendations"]
 outputs:
     filtered_vcf:
         type: File
@@ -28,21 +37,18 @@ steps:
         in:
             vcf: vcf
             reference: reference
-            select_type:
-                default: ["INDEL", "SNP", "SYMBOLIC"]
+            select_type: filter_variant_type
         out:
             [filtered_vcf]
     run_filter:
-        scatter: [vcf, filter_expression, filter_name]
+        scatter: [filter_expression, filter_name, vcf]
         scatterMethod: dotproduct
         run: ../tools/filter_variants.cwl
         in:
             vcf: run_split_vcf/filtered_vcf
             reference: reference
-            filter_expression:
-                default: ["QD < 2.0 || FS > 200.0 || ReadPosRankSum < -20.0", "QD < 2.0 || FS > 60.0 || MQ < 40.0 || MQRankSum < -12.5 || ReadPosRankSum < -8.0", "QD < 2.0 || FS > 200.0 || ReadPosRankSum < -20.0"]
-            filter_name:
-                default: ["INDEL_filter_GATK_recommendations", "SNP_filter_GATK_recommendations", "INDEL_filter_GATK_recommendations"]
+            filter_expression: filter_expression
+            filter_name: filter_name
         out:
             [filtered_vcf]
     run_index_vcf:
