@@ -16,7 +16,12 @@ inputs:
             - File
         secondaryFiles: [.fai]
     filter_variant_type:
-        type: string[]?
+        type:
+            type: array
+            items:
+              - "null"
+              - type: enum
+                symbols: ["INDEL", "SNP", "MIXED", "MNP", "SYMBOLIC", "NO_VARIATION"]
         default: ["INDEL", "SNP", "SYMBOLIC"]
     filter_expression:
         type: string[]?
