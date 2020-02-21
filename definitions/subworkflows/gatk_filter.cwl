@@ -33,7 +33,7 @@ outputs:
     filtered_vcf:
         type: File
         secondaryFiles: [.tbi]
-        outputSource: run_index_concat_vcf/indexed_vcf
+        outputSource: run_index_sorted_vcf/indexed_vcf
 steps:
     run_split_vcf:
         scatter: [select_type]
@@ -74,9 +74,15 @@ steps:
                 default: "z"
         out:
             [concat_vcf]
-    run_index_concat_vcf:
-        run: ../tools/index_vcf.cwl
+    run_sort_concat_vcf:
+        run: ../tools/sort_vcf.cwl
         in:
             vcf: run_concat/concat_vcf
+        out:
+            [sorted_vcf]
+    run_index_sorted_vcf:
+        run: ../tools/index_vcf.cwl
+        in:
+            vcf: run_sort_concat_vcf/sorted_vcf
         out:
             [indexed_vcf]
