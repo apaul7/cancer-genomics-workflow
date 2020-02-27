@@ -24,6 +24,7 @@ requirements:
             parser.add_argument('--output', '-o', dest="output", help='output tsv file name', required=True, action="store")
             parser.add_argument('--filtering_frequency', dest="filtering_frequency", help="frequency to filter with", action="store", type=float, default="0.05")
             parser.add_argument('--all-CDS', dest="CDS", help="Do not require a positive CoDing Sequence overlap", action="store_true")
+            parser.add_argument('--survivor-merged', dest="survivor", help="survivor merge filtering, drop the last filter step", action="store_true")
             parser.add_argument('--ignore-pass-filter', dest="filter", help="Do not require calls to have a PASS filter", action="store_true")
 
             args = parser.parse_args()
@@ -31,6 +32,7 @@ requirements:
             output_file_name = args.output
             filtering_frequency = args.filtering_frequency
             all_cds = args.CDS
+            survivor_merged = args.survivor
             ignore_pass_filter = args.filter
 
             with open(input_file_name, 'r') as file_in, open(output_file_name, 'w') as file_out:
@@ -48,7 +50,7 @@ requirements:
                         and float(row['1000g_max_AF']) < filtering_frequency
                         and not(float(row['DGV_LOSS_Frequency']) > filtering_frequency and 'DEL' in row['SV type']) 
                         and not(float(row['DGV_GAIN_Frequency']) < filtering_frequency and ('DUP' in row['SV type'] or 'INS' in row['SV type']))
-                        and not(('Manta' in row['ID'] and 'IMPRECISE' in row['INFO']) or (row['QUAL'] != '.' and 'IMPRECISE' in row['INFO'])) ):
+                        and (survivor_merged or not(('Manta' in row['ID'] and 'IMPRECISE' in row['INFO']) or (row['QUAL'] != '.' and 'IMPRECISE' in row['INFO']))) ):
                         file_out.writerow(row)
                         pass_sv_count += 1
                 print("total sv count:",total_sv_count)
@@ -81,7 +83,11 @@ inputs:
         inputBinding:
             position: 5
             prefix: "--output"
-
+    survivor_merged:
+        type: boolean?
+        inputBinding:
+            position: 6
+            prefix: "--survivor-merged"
 outputs:
     filtered_tsv:
         type: File
