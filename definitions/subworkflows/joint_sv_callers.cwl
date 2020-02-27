@@ -73,7 +73,77 @@ inputs:
     cnv_filter_min_size:
         type: int?
 
-outputs: []
+outputs:
+    smoove_vcf:
+        type: File
+        outputSource: index_smoove/indexed_vcf
+        secondaryFiles: [.tbi]
+    manta_diploid_vcf:
+        type: File
+        outputSource: manta/diploid_variants
+        secondaryFiles: [.tbi]
+    manta_small_candidates:
+        type: File
+        outputSource: manta/small_candidates
+        secondaryFiles: [.tbi]
+    manta_all_candidates:
+        type: File
+        outputSource: manta/all_candidates
+        secondaryFiles: [.tbi]
+    cnvnator_vcfs:
+        type: File[]
+        outputSource: cnvnator_bgzip_and_index/indexed_vcf
+        secondaryFiles: [.tbi]
+    cnvnator_roots:
+        type: File[]
+        outputSource: cnvnator/root_file
+    cnvnator_cn_files:
+        type: File[]
+        outputSource: cnvnator/cn_file
+    cnvkit_vcfs:
+        type: File[]
+        outputSource: cnvkit_bgzip_and_index/indexed_vcf
+        secondaryFiles: [.tbi]
+    filtered_cnvnator_vcfs:
+        type: File[]
+        outputSource: filter/filtered_cnvnator
+        secondaryFiles: [.tbi]
+    filtered_cnvkit_vcfs:
+        type: File[]
+        outputSource: filter/filtered_cnvkit
+        secondaryFiles: [.tbi]
+    filtered_manta_vcfs:
+        type: File[]
+        outputSource: filter/filtered_manta
+        secondaryFiles: [.tbi]
+    filtered_smoove_vcfs:
+        type: File[]
+        outputSource: filter/filtered_smoove
+        secondaryFiles: [.tbi]
+    bcftools_sv_vcf:
+        type: File
+        outputSource: merge/bcftools_sv_vcf
+    bcftools_annotated_tsv:
+        type: File
+        outputSource: merge/bcftools_annotated_tsv
+    bcftools_annotated_tsv_filtered:
+        type: File
+        outputSource: merge/bcftools_annotated_tsv_filtered
+    bcftools_annotated_tsv_filtered_no_cds:
+        type: File
+        outputSource: merge/bcftools_annotated_tsv_filtered_no_cds
+    survivor_sv_vcf:
+        type: File
+        outputSource: merge/survivor_sv_vcf
+    survivor_annotated_tsv:
+        type: File
+        outputSource: merge/survivor_annotated_tsv
+    survivor_annotated_tsv_filtered:
+        type: File
+        outputSource: merge/survivor_annotated_tsv_filtered
+    survivor_annotated_tsv_filtered_no_cds:
+        type: File
+        outputSource: merge/survivor_annotated_tsv_filtered_no_cds
 steps:
     smoove:
         run: ../tools/smoove.cwl

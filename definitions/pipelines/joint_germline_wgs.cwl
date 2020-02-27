@@ -70,14 +70,91 @@ inputs:
         type: ../types/labelled_file.yml#labelled_file[]
     summary_intervals:
         type: ../types/labelled_file.yml#labelled_file[]
+    cnvkit_diagram:
+        type: boolean?
+    cnvkit_drop_low_coverage:
+        type: boolean?
+    cnvkit_method:
+        type: string?
+    cnvkit_scatter_plot:
+        type: boolean?
+
+    sv_merge_max_distance:
+        type: int
+    sv_merge_min_svs:
+        type: int
+    sv_merge_same_type:
+        type: boolean
+    sv_merge_same_strand:
+        type: boolean
+    sv_merge_estimate_sv_distance:
+        type: boolean
+    sv_merge_min_sv_size:
+        type: int
+    sv_exclude_regions:
+        type: File?
+    genome_build:
+        type: string
+    sv_alt_abundance_percentage:
+        type: double?
+    sv_paired_count:
+        type: int?
+    sv_split_count:
+        type: int?
+    cnv_deletion_depth:
+        type: double?
+    cnv_duplication_depth:
+        type: double?
+    cnv_filter_min_size:
+        type: int?
 outputs:
     per_sample_outs:
         type: Directory[]
-        outputSource: per_sample_outputs/gathered
+        outputSource: per_sample_outputs/gathered_files
     snps_vcf:
         type: File
         outputSource: gatk_filter_vcf/filtered_vcf
         secondaryFiles: [.tbi]
+    smoove_vcf:
+        type: File
+        outputSource: joint_detect_svs/smoove_vcf
+        secondaryFiles: [.tbi]
+    manta_diploid_vcf:
+        type: File
+        outputSource: joint_detect_svs/manta_diploid_vcf
+        secondaryFiles: [.tbi]
+    manta_small_candidates:
+        type: File
+        outputSource: joint_detect_svs/manta_small_candidates
+        secondaryFiles: [.tbi]
+    manta_all_candidates:
+        type: File
+        outputSource: joint_detect_svs/manta_all_candidates
+        secondaryFiles: [.tbi]
+    bcftools_sv_vcf:
+        type: File
+        outputSource: joint_detect_svs/bcftools_sv_vcf
+    bcftools_annotated_tsv:
+        type: File
+        outputSource: joint_detect_svs/bcftools_annotated_tsv
+    bcftools_annotated_tsv_filtered:
+        type: File
+        outputSource: joint_detect_svs/bcftools_annotated_tsv_filtered
+    bcftools_annotated_tsv_filtered_no_cds:
+        type: File
+        outputSource: joint_detect_svs/bcftools_annotated_tsv_filtered_no_cds
+    survivor_sv_vcf:
+        type: File
+        outputSource: joint_detect_svs/survivor_sv_vcf
+    survivor_annotated_tsv:
+        type: File
+        outputSource: joint_detect_svs/survivor_annotated_tsv
+    survivor_annotated_tsv_filtered:
+        type: File
+        outputSource: joint_detect_svs/survivor_annotated_tsv_filtered
+    survivor_annotated_tsv_filtered_no_cds:
+        type: File
+        outputSource: joint_detect_svs/survivor_annotated_tsv_filtered_no_cds
     expansion_hunter_vcf:
         type: File
         outputSource: run_expansion_hunter/merged_expansion_hunter_vcf
@@ -211,6 +288,34 @@ steps:
             reference: reference
         out:
             [filtered_vcf]
+    joint_detect_svs:
+        run: ../subworkflows/joint_sv_callers.cwl
+        in:
+            bams: alignment_and_qc/bam
+            sample_names: sample_name
+            reference: reference
+            cnvkit_diagram: cnvkit_diagram
+            cnvkit_drop_low_coverage: cnvkit_drop_low_coverage
+            cnvkit_method: cnvkit_method
+            cnvkit_scatter_plot: cnvkit_scatter_plot
+            manta_output_contigs:
+                default: true
+            merge_max_distance: sv_merge_max_distance
+            merge_min_svs: sv_merge_min_svs
+            merge_same_type: sv_merge_same_type
+            merge_same_strand: sv_merge_same_strand
+            merge_estimate_sv_distance: sv_merge_estimate_sv_distance
+            merge_min_sv_size: sv_merge_min_sv_size
+            smoove_exclude_regions: sv_exclude_regions
+            snps_vcf: run_joint_gatk/genotype_vcf
+            genome_build: genome_build
+            sv_paired_count: sv_paired_count
+            sv_split_count: sv_split_count
+            cnv_deletion_depth: cnv_deletion_depth
+            cnv_duplication_depth: cnv_duplication_depth
+            cnv_filter_min_size: cnv_filter_min_size
+        out:
+            [smoove_vcf, manta_diploid_vcf, manta_small_candidates, manta_all_candidates, cnvnator_vcfs, cnvnator_roots, cnvnator_cn_files, cnvkit_vcfs, filtered_cnvnator_vcfs, filtered_cnvkit_vcfs, filtered_manta_vcfs, filtered_smoove_vcfs, bcftools_sv_vcf, bcftools_annotated_tsv, bcftools_annotated_tsv_filtered, bcftools_annotated_tsv_filtered_no_cds, survivor_sv_vcf, survivor_annotated_tsv, survivor_annotated_tsv_filtered, survivor_annotated_tsv_filtered_no_cds]
     run_expansion_hunter:
         run: ../subworkflows/joint_str.cwl
         in:
@@ -220,7 +325,7 @@ steps:
             sample_names: sample_name
         out:
             [merged_expansion_hunter_vcf, merged_expansion_hunter_tsv, expansion_hunter_vcfs]
-    per_sample_outputs2:
+    per_sample_outputs:
         scatter: [output_dir]
         scatterMethod: dotproduct
         run: ../tools/gatherer.cwl
@@ -233,7 +338,7 @@ steps:
                     return self + "-outs";
                   }
             all_files:
-                source: [alignment_and_qc/mark_duplicates_metrics, alignment_and_qc/insert_size_metrics, alignment_and_qc/insert_size_histogram, alignment_and_qc/alignment_summary_metrics, alignment_and_qc/gc_bias_metrics, alignment_and_qc/gc_bias_metrics_chart, alignment_and_qc/gc_bias_metrics_summary, alignment_and_qc/wgs_metrics, alignment_and_qc/flagstats, alignment_and_qc/verify_bam_id_metrics, alignment_and_qc/verify_bam_id_depth, index_cram/indexed_cram]
+                source: [alignment_and_qc/mark_duplicates_metrics, alignment_and_qc/insert_size_metrics, alignment_and_qc/insert_size_histogram, alignment_and_qc/alignment_summary_metrics, alignment_and_qc/gc_bias_metrics, alignment_and_qc/gc_bias_metrics_chart, alignment_and_qc/gc_bias_metrics_summary, alignment_and_qc/wgs_metrics, alignment_and_qc/flagstats, alignment_and_qc/verify_bam_id_metrics, alignment_and_qc/verify_bam_id_depth, index_cram/indexed_cram, joint_detect_svs/cnvnator_vcfs, joint_detect_svs/cnvnator_roots, joint_detect_svs/cnvnator_cn_files, joint_detect_svs/cnvkit_vcfs, joint_detect_svs/filtered_cnvnator_vcfs, joint_detect_svs/filtered_cnvkit_vcfs, joint_detect_svs/filtered_manta_vcfs, joint_detect_svs/filtered_smoove_vcfs]
                 valueFrom: |
                   ${
                     var sample_index = inputs.sample_name.indexOf(inputs.output_dir.replace("-outs",""));
