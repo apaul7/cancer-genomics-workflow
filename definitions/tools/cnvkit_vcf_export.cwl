@@ -44,6 +44,11 @@ inputs:
         inputBinding:
             position: 2
             prefix: "--cnr"
+    sample_name:
+        type: string?
+        inputBinding:
+            position: 4
+            prefix: "-i"
     output_name:
         type: string
         inputBinding:
