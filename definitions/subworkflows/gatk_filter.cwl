@@ -33,7 +33,7 @@ outputs:
     filtered_vcf:
         type: File
         secondaryFiles: [.tbi]
-        outputSource: run_index_sorted_vcf/indexed_vcf
+        outputSource: bgzip_and_index/indexed_vcf
 steps:
     run_split_vcf:
         scatter: [select_type]
@@ -80,8 +80,8 @@ steps:
             vcf: run_concat/concat_vcf
         out:
             [sorted_vcf]
-    run_index_sorted_vcf:
-        run: ../tools/index_vcf.cwl
+    bgzip_and_index:
+        run: ../subworkflows/bgzip_and_index.cwl
         in:
             vcf: run_sort_concat_vcf/sorted_vcf
         out:
