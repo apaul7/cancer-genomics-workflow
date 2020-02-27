@@ -31,21 +31,30 @@ inputs:
     sv_vcfs:
         type: File[]
 outputs:
-    bcftools_merged_sv_vcf:
+    bcftools_sv_vcf:
         type: File
         outputSource: bcftools_bgzip_merged_sv_vcf/bgzipped_file
-    bcftools_merged_annotated_tsv:
+    bcftools_annotated_tsv:
         type: File
         outputSource: bcftools_annotate_variants/sv_variants_tsv
-    bcftools_merged_filtered_annotated_tsv:
+    bcftools_annotated_tsv_filtered:
        type: File
        outputSource: bcftools_annotsv_filter/filtered_tsv
-    survivor_merged_sv_vcf:
+    bcftools_annotated_tsv_filtered_no_cds:
+       type: File
+       outputSource: bcftools_annotsv_filter_no_cds/filtered_tsv
+    survivor_sv_vcf:
         type: File
         outputSource: survivor_bgzip_merged_sv_vcf/bgzipped_file
-    survivor_merged_annotated_tsv:
+    survivor_annotated_tsv:
         type: File
         outputSource: survivor_annotate_variants/sv_variants_tsv
+    survivor_annotated_tsv_filtered:
+        type: File
+        outputSource: survivor_annotsv_filter/filtered_tsv
+    survivor_annotated_tsv_filtered_no_cds:
+        type: File
+        outputSource: survivor_annotsv_filter_no_cds/filtered_tsv
 steps:
     survivor_merge_sv_vcfs:
         run: ../tools/survivor.cwl
@@ -70,7 +79,14 @@ steps:
                 default: "SURVIVOR-merged-AnnotSV.tsv"
             snps_vcf:
                 source: [snps_vcf]
-                valueFrom: ${ return [ self ]; }
+                valueFrom: |
+                    ${
+                      if(self){
+                        return [self];
+                      }else{
+                        return null;
+                      }
+                    }
         out:
             [sv_variants_tsv]
     survivor_bgzip_merged_sv_vcf:
@@ -100,20 +116,64 @@ steps:
                 default: "bcftools-merged-AnnotSV.tsv"
             snps_vcf:
                 source: [snps_vcf]
-                valueFrom: ${ return [ self ]; }
+                valueFrom: |
+                    ${
+                      if(self){
+                        return [self];
+                      }else{
+                        return null;
+                      }
+                    }
         out:
             [sv_variants_tsv]
-    bcftools_annotsv_filter:
-        run: ../tools/annotsv_filter.cwl
-        in:
-            annotsv_tsv: bcftools_annotate_variants/sv_variants_tsv
-            filtering_frequency:
-                default: "0.05"
-        out:
-            [filtered_tsv]
     bcftools_bgzip_merged_sv_vcf:
         run: ../tools/bgzip.cwl
         in:
             file: bcftools_merge_sv_vcfs/merged_sv_vcf
         out:
             [bgzipped_file]
+
+    bcftools_annotsv_filter:
+        run: ../tools/annotsv_filter.cwl
+        in:
+            annotsv_tsv: bcftools_annotate_variants/sv_variants_tsv
+            filtering_frequency:
+                default: "0.05"
+            output_tsv_name:
+                default: "bcftools-merged.filtered.AnnotSV.tsv"
+        out:
+            [filtered_tsv]
+    bcftools_annotsv_filter_no_cds:
+        run: ../tools/annotsv_filter.cwl
+        in:
+            annotsv_tsv: bcftools_annotate_variants/sv_variants_tsv
+            filtering_frequency:
+                default: "0.05"
+            all_CDS:
+                default: true
+            output_tsv_name:
+                default: "bcftools-merged.filtered-noCDS.AnnotSV.tsv"
+        out:
+            [filtered_tsv]
+    survivor_annotsv_filter:
+        run: ../tools/annotsv_filter.cwl
+        in:
+            annotsv_tsv: survivor_annotate_variants/sv_variants_tsv
+            filtering_frequency:
+                default: "0.05"
+            output_tsv_name:
+                default: "survivor-merged.filtered.AnnotSV.tsv"
+        out:
+            [filtered_tsv]
+    survivor_annotsv_filter_no_cds:
+        run: ../tools/annotsv_filter.cwl
+        in:
+            annotsv_tsv: survivor_annotate_variants/sv_variants_tsv
+            filtering_frequency:
+                default: "0.05"
+            all_CDS:
+                default: true
+            output_tsv_name:
+                default: "survivor-merged.filtered-noCDS.AnnotSV.tsv"
+        out:
+            [filtered_tsv]
