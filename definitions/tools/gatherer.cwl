@@ -2,7 +2,6 @@
 
 cwlVersion: v1.0
 class: CommandLineTool
-baseCommand: ['/bin/cp']
 
 requirements:
     - class: ShellCommandRequirement
@@ -22,10 +21,19 @@ inputs:
         type: File[]
         inputBinding:
             position: 2
+    all_array_files:
+        type:
+            - 'null'
+            - type: array
+              items:
+                  type: array
+                  items: File
+        inputBinding:
+            position: 3
     all_directories:
         type: Directory[]?
         inputBinding:
-            position: 3
+            position: 4
 outputs:
     gathered_files:
         type: Directory
