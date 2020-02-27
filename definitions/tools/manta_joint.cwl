@@ -28,6 +28,7 @@ inputs:
             inputBinding:
                 position: -2
                 prefix: "--bam="
+                separate: false
         secondaryFiles: ${if (self.nameext === ".bam") {return self.basename + ".bai"} else {return self.basename + ".crai"}}
     reference:
         type:
