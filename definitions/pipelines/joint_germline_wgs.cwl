@@ -13,6 +13,7 @@ requirements:
     - class: SubworkflowFeatureRequirement
     - class: StepInputExpressionRequirement
     - class: MultipleInputFeatureRequirement
+    - class: InlineJavascriptRequirement
 inputs:
     reference:
         type:
@@ -27,6 +28,8 @@ inputs:
                 items: ../types/sequence_data.yml#sequence_data
     sample_name:
         type: string[]
+    expansion_hunter_catalog:
+        type: File
     mills:
         type: File
         secondaryFiles: [.tbi]
@@ -70,19 +73,27 @@ inputs:
 outputs:
     per_sample_outs:
         type: Directory[]
-        outputSource: per_sample_outputs/gathered_files
-    vcf:
+        outputSource: per_sample_outputs/gathered
+    snps_vcf:
         type: File
-        secondaryFiles: [.tbi]
         outputSource: gatk_filter_vcf/filtered_vcf
+        secondaryFiles: [.tbi]
+    expansion_hunter_vcf:
+        type: File
+        outputSource: run_expansion_hunter/merged_expansion_hunter_vcf
+        secondaryFiles: [.tbi]
+    expansion_hunter_tsv:
+        type: File
+        outputSource: run_expansion_hunter/merged_expansion_hunter_tsv
 steps:
     alignment_and_qc:
-        scatter: [sequence]
+        scatter: [sequence, sample_name]
         scatterMethod: dotproduct
         run: alignment_wgs.cwl
         in:
             reference: reference
             sequence: sequence
+            sample_name: sample_name
             mills: mills
             known_indels: known_indels
             dbsnp_vcf: dbsnp_vcf
@@ -200,11 +211,21 @@ steps:
             reference: reference
         out:
             [filtered_vcf]
-    per_sample_outputs:
-        scatter: [output_dir, all_files]
+    run_expansion_hunter:
+        run: ../subworkflows/joint_str.cwl
+        in:
+            bams: alignment_and_qc/bam
+            reference: reference
+            variant_catalog: expansion_hunter_catalog
+            sample_names: sample_name
+        out:
+            [merged_expansion_hunter_vcf, merged_expansion_hunter_tsv, expansion_hunter_vcfs]
+    per_sample_outputs2:
+        scatter: [output_dir]
         scatterMethod: dotproduct
         run: ../tools/gatherer.cwl
         in:
+            sample_name: sample_name
             output_dir:
                 source: sample_name
                 valueFrom: |
@@ -212,18 +233,16 @@ steps:
                     return self + "-outs";
                   }
             all_files:
-                source: [alignment_and_qc/mark_duplicates_metrics, alignment_and_qc/insert_size_metrics, alignment_and_qc/insert_size_histogram, alignment_and_qc/alignment_summary_metrics, alignment_and_qc/gc_bias_metrics, alignment_and_qc/gc_bias_metrics_chart, alignment_and_qc/gc_bias_metrics_summary, alignment_and_qc/wgs_metrics, alignment_and_qc/flagstats, alignment_and_qc/verify_bam_id_metrics, alignment_and_qc/verify_bam_id_depth, index_cram/indexed_cram, haplotype_caller/gvcf]
-        #        linkMerge: merge_flattened
+                source: [alignment_and_qc/mark_duplicates_metrics, alignment_and_qc/insert_size_metrics, alignment_and_qc/insert_size_histogram, alignment_and_qc/alignment_summary_metrics, alignment_and_qc/gc_bias_metrics, alignment_and_qc/gc_bias_metrics_chart, alignment_and_qc/gc_bias_metrics_summary, alignment_and_qc/wgs_metrics, alignment_and_qc/flagstats, alignment_and_qc/verify_bam_id_metrics, alignment_and_qc/verify_bam_id_depth, index_cram/indexed_cram]
                 valueFrom: |
-                           ${
-                               var files = [];
-                               var len = self.length;
-                               for (var i = 0; i < len; i++) {
-                                   var len2 = self[i].length;
-                                   for (var j = 0; j < len2; j++) {
-                                       files.push(self[i][j]);
-                                   }
-                               }
-                               return files;
-                           }
-        out: [gathered_files]
+                  ${
+                    var sample_index = inputs.sample_name.indexOf(inputs.output_dir.replace("-outs",""));
+                    var input_length = self[0].length;
+                    var sample_files = [];
+                    for(var i=0; i<input_length; i++){
+                      sample_files.push(self[i][sample_index]);
+                    }
+                    return sample_files;
+                  }
+        out:
+            [gathered_files]
