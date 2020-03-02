@@ -73,7 +73,7 @@ steps:
         out:
             [hs_metrics]
     collect_per_base_hs_metrics:
-        run: ../tools/collect_hs_metrics.cwl
+        run: ../tools/collect_hs_metrics_per_base.cwl
         scatter: [bait_intervals, target_intervals, output_prefix]
         scatterMethod: dotproduct
         in:
@@ -99,7 +99,7 @@ steps:
         out:
             [hs_metrics, per_base_coverage_metrics]
     collect_per_target_hs_metrics:
-        run: ../tools/collect_hs_metrics.cwl
+        run: ../tools/collect_hs_metrics_per_target.cwl
         scatter: [bait_intervals, target_intervals, output_prefix]
         scatterMethod: dotproduct
         in:

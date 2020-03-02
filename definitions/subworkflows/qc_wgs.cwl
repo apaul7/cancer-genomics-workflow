@@ -4,6 +4,9 @@ cwlVersion: v1.0
 class: Workflow
 label: "WGS QC workflow"
 requirements:
+    - class: SchemaDefRequirement
+      types:
+          - $import: ../types/labelled_file.yml
     - class: SubworkflowFeatureRequirement
 inputs:
     sample_name:
@@ -29,6 +32,12 @@ inputs:
         type: int?
     minimum_base_quality:
         type: int?
+    per_base_intervals:
+        type: ../types/labelled_file.yml#labelled_file[]
+    per_target_intervals:
+        type: ../types/labelled_file.yml#labelled_file[]
+    summary_intervals:
+        type: ../types/labelled_file.yml#labelled_file[]
 outputs:
     insert_size_metrics:
         type: File
@@ -60,6 +69,21 @@ outputs:
     verify_bam_id_depth:
         type: File
         outputSource: verify_bam_id/verify_bam_id_depth
+    per_base_coverage_metrics:
+        type: File[]
+        outputSource: collect_hs_metrics/per_base_coverage_metrics
+    per_base_hs_metrics:
+        type: File[]
+        outputSource: collect_hs_metrics/per_base_hs_metrics
+    per_target_coverage_metrics:
+        type: File[]
+        outputSource: collect_hs_metrics/per_target_coverage_metrics
+    per_target_hs_metrics:
+        type: File[]
+        outputSource: collect_hs_metrics/per_target_hs_metrics
+    summary_hs_metrics:
+        type: File[]
+        outputSource: collect_hs_metrics/summary_hs_metrics
 steps:
     collect_insert_size_metrics:
         run: ../tools/collect_insert_size_metrics.cwl
@@ -107,3 +131,15 @@ steps:
             vcf: omni_vcf
         out:
             [verify_bam_id_metrics, verify_bam_id_depth]
+    collect_hs_metrics:
+        run: hs_metrics.cwl
+        in:
+            bam: bam
+            minimum_mapping_quality: minimum_mapping_quality
+            minimum_base_quality: minimum_base_quality
+            per_base_intervals: per_base_intervals
+            per_target_intervals: per_target_intervals
+            reference: reference
+            summary_intervals: summary_intervals
+        out:
+            [per_base_coverage_metrics, per_base_hs_metrics, per_target_coverage_metrics, per_target_hs_metrics, summary_hs_metrics]
