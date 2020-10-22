@@ -144,8 +144,7 @@ inputs:
     cnv_filter_min_size:
          type: int?
     blocklist_bedpe:
-        type: string?
-        default: 'NONE'
+        type: File?
     disclaimer_text:
         type: string?
         default: 'Workflow source can be found at https://github.com/genome/analysis-workflows'
