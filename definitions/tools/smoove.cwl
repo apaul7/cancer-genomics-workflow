@@ -5,11 +5,11 @@ class: CommandLineTool
 label: "Run Smoove v0.1.6"
 
 baseCommand: "/usr/bin/smoove"
-arguments: ["call", "--processes", "4", "-F"]
+arguments: ["call", "--processes", $(runtime.cores), "-F"]
 
 requirements:
     - class: DockerRequirement
-      dockerPull: "brentp/smoove:v0.2.5"
+      dockerPull: "brentp/smoove:v0.2.6"
     - class: ResourceRequirement
       ramMin: 20000
       coresMin: 4
