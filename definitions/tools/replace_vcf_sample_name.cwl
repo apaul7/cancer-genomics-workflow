@@ -17,7 +17,6 @@ requirements:
           #!/bin/bash
           set -eou pipefail
           basen=`basename "$3"`
-          basen="renamed.$basen"
 
           #escape spaces, otherwise bcftools will try to use them as a delimiter
           #triple backslash to escape within backticks and then again within sed
@@ -48,4 +47,4 @@ outputs:
     renamed_vcf:
         type: File
         outputBinding:
-            glob: $("renamed." + inputs.input_vcf.basename)
+            glob: $(inputs.input_vcf.basename)
