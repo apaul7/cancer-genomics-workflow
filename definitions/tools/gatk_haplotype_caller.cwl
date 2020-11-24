@@ -58,6 +58,14 @@ inputs:
         inputBinding:
             prefix: "-contamination"
             position: 7
+            valueFrom: |
+                ${
+                  if(inputs.contamination_fraction && inputs.contamination_fraction != '-1'){
+                    return "-contamination " + inputs.contamination_fraction;
+                  } else {
+                    return "";
+                  }
+                }
     max_alternate_alleles:
         type: int?
         doc: 'maximum number of alternate alleles to genotype'
