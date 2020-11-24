@@ -19,7 +19,7 @@ requirements:
             files="${@:2}"
             mkdir $outdir
             chmod -R 777 $outdir
-            cp -t $outdir $files
+            cp --recursive --target-directory $outdir $files
 
             exit 0
 
@@ -29,9 +29,21 @@ inputs:
         inputBinding:
             position: 1
     files:
-        type: File[]
+        type: File[]?
         inputBinding:
             position: 2
+    directories:
+        type: Directory[]?
+        inputBinding:
+            position: 3
+    directory:
+        type: Directory?
+        inputBinding:
+            position: 4
+    file:
+        type: File?
+        inputBinding:
+            position: 5
 outputs:
     gathered_directory:
         type: Directory
