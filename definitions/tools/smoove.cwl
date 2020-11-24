@@ -4,12 +4,12 @@ cwlVersion: v1.0
 class: CommandLineTool
 label: "Run Smoove v0.1.6"
 
-baseCommand: "/usr/local/bin/smoove"
+baseCommand: "/usr/bin/smoove"
 arguments: ["call", "--processes", "4", "-F"]
 
 requirements:
     - class: DockerRequirement
-      dockerPull: "brentp/smoove@sha256:9d5098d3882df1443aae36922d36b5188af1cb9b8f83dab4a9ed041a6a8019cc"
+      dockerPull: "brentp/smoove:v0.2.5"
     - class: ResourceRequirement
       ramMin: 20000
       coresMin: 4
@@ -46,7 +46,7 @@ inputs:
         doc: "Bed file used to exclude regions"
 
 outputs:
-    output_vcf:
+    vcf:
         type: File
         outputBinding:
             glob: "$(inputs.cohort_name)-smoove.genotyped.vcf.gz"
