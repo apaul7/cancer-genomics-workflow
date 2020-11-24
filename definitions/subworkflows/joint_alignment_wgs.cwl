@@ -112,52 +112,80 @@ steps:
             cram: bam_to_cram/cram
          out:
             [indexed_cram]
+    get_indices:
+        in:
+            samples: sample_names
+        out:
+            [sample_indices]
+        run:
+            class: ExpressionTool
+            requirements:
+                - class: InlineJavascriptRequirement
+            inputs:
+                samples:
+                    type: string[]
+            outputs:
+                sample_indices:
+                    type: string[]
+            expression: |
+                ${
+                    var results = [];
+                    for(var i=0; i<inputs.samples.length; i++){
+                        results.push(i);
+                    }
+                    return {'sample_indices:': results };
+                }
     gather_alignment:
-        scatter: [outdir, files]
+        scatter: [outdir, sample_index]
         scatterMethod: dotproduct
         run: ../tools/gather_to_sub_directory_files.cwl
         in:
+            sample_index: get_indices/sample_indices
             outdir:
                 source: [sample_names]
                 valueFrom: "$(self)-alignments"
             files:
                 source: [index_cram/indexed_cram, alignment/mark_duplicates_metrics_file]
+                valueFrom: |
+                    ${
+                        var results = [];
+                        for(var i=0; i<self.length; i++){
+                            results.push(self[i][inputs.sample_index]);
+                            # check for secondary files?
+                        }
+                        return results;
+                    }
         out:
             [gathered_directory]
-    gather_qc_1:
-        scatter: [outdir, files]
+    gather_qc:
+        scatter: [outdir, sample_index]
         scatterMethod: dotproduct
         run: ../tools/gather_to_sub_directory_files.cwl
         in:
+            sample_index: get_indices/sample_indices
             outdir:
                 source: [sample_names]
                 valueFrom: "$(self)-qc"
             files:
-                source: [qc/insert_size_metrics, qc/insert_size_histogram, qc/alignment_summary_metrics, qc/gc_bias_metrics, qc/gc_bias_metrics_chart, qc/gc_bias_metrics_summary, qc/wgs_metrics, qc/flagstats, qc/verify_bam_id_metrics, qc/verify_bam_id_depth]
-            #files2:
-            #    source: [qc/per_base_coverage_metrics, qc/per_base_hs_metrics, qc/per_target_coverage_metrics, qc/per_target_hs_metrics, qc/summary_hs_metrics]
-                #linkMerge: merge_flattened
+                source: [qc/insert_size_metrics, qc/insert_size_histogram, qc/alignment_summary_metrics, qc/gc_bias_metrics, qc/gc_bias_metrics_chart, qc/gc_bias_metrics_summary, qc/wgs_metrics, qc/flagstats, qc/verify_bam_id_metrics, qc/verify_bam_id_depth, qc/per_base_coverage_metrics, qc/per_base_hs_metrics, qc/per_target_coverage_metrics, qc/per_target_hs_metrics, qc/summary_hs_metrics]
+                valueFrom: |
+                    ${
+                        var results = [];
+                        for(var i=0; i<self.length; i++){
+                            results.push(self[i][inputs.sample_index])
+                            # check for secondary files?
+                        }
+                        return results
+                    }
         out:
             [gathered_directory]
-#    gather_qc_2:
-#        scatter: [dir, files]
-#        scatterMethod: dotproduct
-#        run: ../tools/move_to_sub_directory.cwl
-#        in:
-#            dir: gather_qc_1/gathered_directory
-#            files:
-#                source: [qc/per_base_coverage_metrics, qc/per_base_hs_metrics, qc/per_target_coverage_metrics, qc/per_target_hs_metrics, qc/summary_hs_metrics]
-#                linkMerge: merge_flattened
-#        out:
-#            [gathered_directory]
     gather_all:
         run: ../tools/gather_to_sub_directory_dirs.cwl
         in:
             outdir:
                 default: "alignment_pipeline"
             directories:
-                #source: [gather_alignment/gathered_directory, gather_qc_2/gathered_directory]
-                source: [gather_alignment/gathered_directory]
+                source: [gather_alignment/gathered_directory, gather_qc/gathered_directory]
                 linkMerge: merge_flattened
         out:
             [gathered_directory]
