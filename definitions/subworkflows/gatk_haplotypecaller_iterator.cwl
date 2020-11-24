@@ -16,6 +16,9 @@ inputs:
     bam:
         type: File
         secondaryFiles: [^.bai]
+    sample_name:
+        type: string?
+        default: "sample"
     emit_reference_confidence:
         type:
             type: enum
@@ -48,6 +51,9 @@ outputs:
         type: File[]
         outputSource: haplotype_caller/gvcf
         secondaryFiles: [.tbi]
+    staged_gvcf:
+        type: Directory
+        outputSource: gather/gathered_directory
 steps:
     haplotype_caller:
         scatter: [intervals]
@@ -75,3 +81,12 @@ steps:
                 }'
         out:
             [gvcf]
+    gather:
+        run: ../tools/gather_to_sub_directory_files.cwl
+        in:
+            outdir:
+                source: sample_name
+                valueFrom: "$(self)-gvcfs"
+            files: haplotype_caller/gvcf
+        out:
+            [gathered_directory]
