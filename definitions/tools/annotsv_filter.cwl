@@ -46,6 +46,7 @@ requirements:
                         and (int(row['CDS length']) > 0 or all_cds) \
                         and float(row['IMH_AF']) < filtering_frequency
                         and float(row['1000g_max_AF']) < filtering_frequency
+                        and float(row['GD_AF']) < filtering_frequency
                         and not(float(row['DGV_LOSS_Frequency']) > filtering_frequency and 'DEL' in row['SV type']) 
                         and not(float(row['DGV_GAIN_Frequency']) > filtering_frequency and ('DUP' in row['SV type'] or 'INS' in row['SV type']))
                         and not(('Manta' in row['ID'] and 'IMPRECISE' in row['INFO']) or (row['QUAL'] != '.' and 'IMPRECISE' in row['INFO'])) ):
