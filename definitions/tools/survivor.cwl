@@ -76,7 +76,7 @@ inputs:
         inputBinding:
             position: 7
         doc: "Minimum size of SVs to merge"
-    cohort_name:
+    output_name:
         type: string?
         inputBinding:
             position: 8
@@ -87,5 +87,5 @@ outputs:
   merged_vcf:
     type: File
     outputBinding:
-      glob: "$(inputs.cohort_name)"
+      glob: "$(inputs.output_name)"
 
