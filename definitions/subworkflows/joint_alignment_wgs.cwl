@@ -133,7 +133,7 @@ steps:
                     for(var i=0; i<inputs.samples.length; i++){
                         results.push(i);
                     }
-                    return {'sample_indices:': results };
+                    return {'sample_indices': results };
                 }
     gather_alignment:
         scatter: [outdir, sample_index]
