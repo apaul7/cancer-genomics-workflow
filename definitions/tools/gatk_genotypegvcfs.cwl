@@ -3,15 +3,15 @@
 cwlVersion: v1.0
 class: CommandLineTool
 label: "GATK GenotypeGVCFs"
-baseCommand: ["/gatk/gatk", "--java-options", "-Xmx14g -Xms5g", "GenotypeGVCFs"]
+baseCommand: ["/usr/bin/java", "-Xmx8g", "-jar", "/opt/GenomeAnalysisTK.jar", "-T", "GenotypeGVCFs"]
 requirements:
     - class: ResourceRequirement
       ramMin: 9000
     - class: InlineJavascriptRequirement
     - class: DockerRequirement
-      dockerPull: "broadinstitute/gatk:4.1.8.1" 
+      dockerPull: "mgibio/gatk-cwl:3.5.0"
 arguments:
-    ["-G", "StandardAnnotation", "-O", 'genotype.vcf.gz']
+    ["-o", "genotype.vcf.gz"]
 inputs:
     reference:
         type:
@@ -22,19 +22,30 @@ inputs:
             prefix: "-R"
             position: 1
     gvcfs:
-        type:
-            type: array
-            items: File
-            inputBinding:
-                prefix: "--variant"
+        type: File
         inputBinding:
             position: 2
-    dbsnp_vcf:
-        type: File?
+            prefix: "--variant"
+    intervals:
+        type:
+            type: array
+            items: string
+            inputBinding:
+                prefix: "-L"
         inputBinding:
-            prefix: "--dbsnp"
             position: 3
-        secondaryFiles: [.tbi]
+    min_conf_emit_threshold:
+        type: int?
+        doc: 'The minimum phred-scaled confidence threshold at which variants should be emitted(and filtered with LowQual if less than the calling threshold)'
+        inputBinding:
+            prefix: '--standard_min_confidence_threshold_for_emitting'
+            position: 4
+    min_conf_call_threshold:
+        type: int?
+        doc: 'The minimum phred-scaled confidence threshold at which variants should be called'
+        inputBinding:
+            prefix: '--standard_min_confidence_threshold_for_calling'
+            position: 5
 outputs:
     genotype_vcf:
         type: File
