@@ -198,8 +198,6 @@ steps:
                 default: "gatk"
             files:
                 source: [bgzip_index/indexed_vcf, filter/filtered_vcf, rare_indels/vcf, rare_indels/tsv]
-                #source: [bgzip_index/indexed_vcf, filter/filtered_vcf]
-                #linkMerge: merge_flattened
             directories: make_gvcf/staged_gvcf
         out:
             [gathered_directory]
