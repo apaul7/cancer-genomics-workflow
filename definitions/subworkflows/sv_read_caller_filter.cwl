@@ -36,6 +36,7 @@ outputs:
     filtered_vcf:
         type: File
         outputSource: filtered_vcf_index/indexed_vcf
+        secondaryFiles: [.tbi]
 steps:
     read_support_filter:
         run: ../tools/filter_sv_vcf_read_support.cwl
