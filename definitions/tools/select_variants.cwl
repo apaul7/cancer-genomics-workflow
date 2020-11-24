@@ -2,16 +2,16 @@
 
 cwlVersion: v1.0
 class: CommandLineTool
-label: "SelectVariants (GATK 4.1.8.1)"
-baseCommand: ["/gatk/gatk", "--java-options", "-Xmx4g", "SelectVariants"]
+label: "SelectVariants (GATK 3.6)"
+baseCommand: ["/usr/bin/java", "-Xmx4g", "-jar", "/opt/GenomeAnalysisTK.jar", "-T", "SelectVariants"]
 requirements:
     - class: ResourceRequirement
       ramMin: 6000
       tmpdirMin: 25000
     - class: DockerRequirement
-      dockerPull: "broadinstitute/gatk:4.1.8.1"
+      dockerPull: "mgibio/gatk-cwl:3.5.0"
 arguments:
-    ["-O", { valueFrom: $(runtime.outdir)/$(inputs.output_vcf_basename).vcf.gz }]
+    ["-o", { valueFrom: $(runtime.outdir)/$(inputs.output_vcf_basename).vcf.gz }]
 inputs:
     reference:
         type:
@@ -35,7 +35,7 @@ inputs:
     exclude_filtered:
         type: boolean?
         inputBinding:
-            prefix: "--exclude-filtered"
+            prefix: "--excludeFiltered"
             position: 4
     output_vcf_basename:
         type: string?
@@ -43,7 +43,7 @@ inputs:
     samples_to_include:
         type: string[]?
         inputBinding:
-            prefix: "--sample-name"
+            prefix: "--sample_name"
             position: 5
         doc: 'include genotypes from this sample'
     select_type:
@@ -52,7 +52,7 @@ inputs:
             - type: enum
               symbols: ["INDEL", "SNP", "MIXED", "MNP", "SYMBOLIC", "NO_VARIATION"]
         inputBinding:
-            prefix: "-select-type"
+            prefix: "-selectType"
             position: 6
         doc: 'select only a certain type of variants' 
 outputs:
