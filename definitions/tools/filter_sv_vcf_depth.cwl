@@ -70,7 +70,7 @@ inputs:
         doc: "source caller of the vcf input file"
 
 outputs:
-    filtered_sv_vcf:
+    vcf:
         type: File
         outputBinding:
             glob: $(inputs.output_vcf_name)
