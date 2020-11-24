@@ -1,0 +1,163 @@
+#!/usr/bin/env cwl-runner
+
+cwlVersion: v1.0
+class: Workflow
+label: "joint wgs alignment with qc"
+requirements:
+    - class: SchemaDefRequirement
+      types:
+          - $import: ../types/labelled_file.yml
+          - $import: ../types/sequence_data.yml
+          - $import: ../types/trimming_options.yml
+    - class: SubworkflowFeatureRequirement
+    - class: ScatterFeatureRequirement
+    - class: MultipleInputFeatureRequirement
+inputs:
+    reference:
+        type:
+            - string
+            - File
+        secondaryFiles: [.fai, ^.dict, .amb, .ann, .bwt, .pac, .sa]
+    sequences:
+        type:
+            type: array
+            items:
+                type: array
+                items: ../types/sequence_data.yml#sequence_data
+    sample_names:
+        type: string[]
+    trimming:
+        type:
+            - ../types/trimming_options.yml#trimming_options
+            - "null"
+    mills:
+        type: File
+        secondaryFiles: [.tbi]
+    known_indels:
+        type: File
+        secondaryFiles: [.tbi]
+    dbsnp_vcf:
+        type: File
+        secondaryFiles: [.tbi]
+    omni_vcf:
+        type: File
+        secondaryFiles: [.tbi]
+    intervals:
+        type: File
+    picard_metric_accumulation_level:
+        type: string
+    bqsr_intervals:
+        type: string[]?
+    minimum_mapping_quality:
+        type: int?
+    minimum_base_quality:
+        type: int?
+    per_base_intervals:
+        type: ../types/labelled_file.yml#labelled_file[]
+    per_target_intervals:
+        type: ../types/labelled_file.yml#labelled_file[]
+    summary_intervals:
+        type: ../types/labelled_file.yml#labelled_file[]
+outputs:
+    bams:
+        type: File[]
+        outputSource: alignment/final_bam
+    verify_bam_id_metrics:
+        type: File[]
+        outputSource: qc/verify_bam_id_metrics
+    gathered_results:
+        type: Directory
+        outputSource: gather_all/gathered_directory
+steps:
+    alignment:
+        scatter: [unaligned]
+        run: ../subworkflows/sequence_to_bqsr.cwl
+        in:
+            reference: reference
+            unaligned: sequences
+            trimming: trimming
+            mills: mills
+            known_indels: known_indels
+            dbsnp_vcf: dbsnp_vcf
+            bqsr_intervals: bqsr_intervals
+        out: [final_bam,mark_duplicates_metrics_file]
+    qc:
+        scatter: [bam]
+        run: ../subworkflows/qc_wgs.cwl
+        in:
+            bam: alignment/final_bam
+            reference: reference
+            omni_vcf: omni_vcf
+            intervals: intervals
+            picard_metric_accumulation_level: picard_metric_accumulation_level
+            minimum_mapping_quality: minimum_mapping_quality
+            minimum_base_quality: minimum_base_quality
+            per_base_intervals: per_base_intervals
+            per_target_intervals: per_target_intervals
+            summary_intervals: summary_intervals
+        out: [insert_size_metrics, insert_size_histogram, alignment_summary_metrics, gc_bias_metrics, gc_bias_metrics_chart, gc_bias_metrics_summary, wgs_metrics, flagstats, verify_bam_id_metrics, verify_bam_id_depth, per_base_coverage_metrics, per_base_hs_metrics, per_target_coverage_metrics, per_target_hs_metrics, summary_hs_metrics]
+
+    bam_to_cram:
+        scatter: [bam]
+        run: ../tools/bam_to_cram.cwl
+        in:
+            bam: alignment/final_bam
+            reference: reference
+        out:
+            [cram]
+    index_cram:
+         scatter: [cram]
+         run: ../tools/index_cram.cwl
+         in:
+            cram: bam_to_cram/cram
+         out:
+            [indexed_cram]
+    gather_alignment:
+        scatter: [outdir, files]
+        scatterMethod: dotproduct
+        run: ../tools/gather_to_sub_directory_files.cwl
+        in:
+            outdir:
+                source: [sample_names]
+                valueFrom: "$(self)-alignments"
+            files:
+                source: [index_cram/indexed_cram, alignment/mark_duplicates_metrics_file]
+        out:
+            [gathered_directory]
+    gather_qc_1:
+        scatter: [outdir, files]
+        scatterMethod: dotproduct
+        run: ../tools/gather_to_sub_directory_files.cwl
+        in:
+            outdir:
+                source: [sample_names]
+                valueFrom: "$(self)-qc"
+            files:
+                source: [qc/insert_size_metrics, qc/insert_size_histogram, qc/alignment_summary_metrics, qc/gc_bias_metrics, qc/gc_bias_metrics_chart, qc/gc_bias_metrics_summary, qc/wgs_metrics, qc/flagstats, qc/verify_bam_id_metrics, qc/verify_bam_id_depth]
+            #files2:
+            #    source: [qc/per_base_coverage_metrics, qc/per_base_hs_metrics, qc/per_target_coverage_metrics, qc/per_target_hs_metrics, qc/summary_hs_metrics]
+                #linkMerge: merge_flattened
+        out:
+            [gathered_directory]
+#    gather_qc_2:
+#        scatter: [dir, files]
+#        scatterMethod: dotproduct
+#        run: ../tools/move_to_sub_directory.cwl
+#        in:
+#            dir: gather_qc_1/gathered_directory
+#            files:
+#                source: [qc/per_base_coverage_metrics, qc/per_base_hs_metrics, qc/per_target_coverage_metrics, qc/per_target_hs_metrics, qc/summary_hs_metrics]
+#                linkMerge: merge_flattened
+#        out:
+#            [gathered_directory]
+    gather_all:
+        run: ../tools/gather_to_sub_directory_dirs.cwl
+        in:
+            outdir:
+                default: "alignment_pipeline"
+            directories:
+                #source: [gather_alignment/gathered_directory, gather_qc_2/gathered_directory]
+                source: [gather_alignment/gathered_directory]
+                linkMerge: merge_flattened
+        out:
+            [gathered_directory]
