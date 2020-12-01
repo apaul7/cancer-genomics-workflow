@@ -117,5 +117,7 @@ steps:
             vcf: bgzip_index_filter/indexed_vcf
             vep_fields: vep_tsv_fields
             tsv: make_tsv/variants_tsv
+            prefix:
+                default: "indels.annotated.filtered.tsv"
         out:
             [annotated_variants_tsv]

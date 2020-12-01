@@ -67,8 +67,6 @@ steps:
         run: ../tools/bcftools_concat.cwl
         in:
             vcfs: run_index_vcf/indexed_vcf
-            output_vcf_name:
-                default: "combined.all.gt.vt.filtered.vcf.gz"
             output_type:
                 default: "z"
         out:
@@ -77,6 +75,8 @@ steps:
         run: ../tools/sort_vcf.cwl
         in:
             vcf: run_concat/concat_vcf
+            prefix:
+                default: "combined.all.gt.vt.filtered.vcf"
         out:
             [sorted_vcf]
     bgzip_and_index:

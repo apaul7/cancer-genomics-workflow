@@ -5,8 +5,6 @@ class: CommandLineTool
 label: "Sort VCF"
 
 baseCommand: ["/usr/bin/java", "-Xmx16g", "-jar", "/opt/picard/picard.jar", "SortVcf"]
-arguments:
-    ["O=", { valueFrom: $(runtime.outdir)/sorted.vcf }]
 requirements:
     - class: ResourceRequirement
       ramMin: 18000
@@ -21,8 +19,13 @@ inputs:
         type: File?
         inputBinding:
             prefix: "SEQUENCE_DICTIONARY="
+    output_vcf_name:
+        type: string?
+        inputBinding:
+            prefix: "O="
+        default: "sorted.vcf"
 outputs:
     sorted_vcf:
         type: File
         outputBinding:
-            glob: "sorted.vcf"
+            glob: $(inputs.output_vcf_name)
