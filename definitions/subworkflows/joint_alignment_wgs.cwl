@@ -12,6 +12,7 @@ requirements:
     - class: SubworkflowFeatureRequirement
     - class: ScatterFeatureRequirement
     - class: MultipleInputFeatureRequirement
+    - class: StepInputExpressionRequirement
 inputs:
     reference:
         type:
@@ -82,10 +83,12 @@ steps:
             bqsr_intervals: bqsr_intervals
         out: [final_bam,mark_duplicates_metrics_file]
     qc:
-        scatter: [bam]
-        run: ../subworkflows/qc_wgs.cwl
+        scatter: [bam, sample_name]
+        scatterMethod: dotproduct
+        run: ../subworkflows/gathered_qc_wgs.cwl
         in:
             bam: alignment/final_bam
+            sample_name: sample_names
             reference: reference
             omni_vcf: omni_vcf
             intervals: intervals
@@ -95,7 +98,7 @@ steps:
             per_base_intervals: per_base_intervals
             per_target_intervals: per_target_intervals
             summary_intervals: summary_intervals
-        out: [insert_size_metrics, insert_size_histogram, alignment_summary_metrics, gc_bias_metrics, gc_bias_metrics_chart, gc_bias_metrics_summary, wgs_metrics, flagstats, verify_bam_id_metrics, verify_bam_id_depth, per_base_coverage_metrics, per_base_hs_metrics, per_target_coverage_metrics, per_target_hs_metrics, summary_hs_metrics]
+        out: [verify_bam_id_metrics, gathered_results]
 
     bam_to_cram:
         scatter: [bam]
@@ -151,31 +154,8 @@ steps:
                         var results = [];
                         for(var i=0; i<self.length; i++){
                             results.push(self[i][inputs.sample_index]);
-                            # check for secondary files?
                         }
                         return results;
-                    }
-        out:
-            [gathered_directory]
-    gather_qc:
-        scatter: [outdir, sample_index]
-        scatterMethod: dotproduct
-        run: ../tools/gather_to_sub_directory_files.cwl
-        in:
-            sample_index: get_indices/sample_indices
-            outdir:
-                source: [sample_names]
-                valueFrom: "$(self)-qc"
-            files:
-                source: [qc/insert_size_metrics, qc/insert_size_histogram, qc/alignment_summary_metrics, qc/gc_bias_metrics, qc/gc_bias_metrics_chart, qc/gc_bias_metrics_summary, qc/wgs_metrics, qc/flagstats, qc/verify_bam_id_metrics, qc/verify_bam_id_depth, qc/per_base_coverage_metrics, qc/per_base_hs_metrics, qc/per_target_coverage_metrics, qc/per_target_hs_metrics, qc/summary_hs_metrics]
-                valueFrom: |
-                    ${
-                        var results = [];
-                        for(var i=0; i<self.length; i++){
-                            results.push(self[i][inputs.sample_index])
-                            # check for secondary files?
-                        }
-                        return results
                     }
         out:
             [gathered_directory]
@@ -185,7 +165,7 @@ steps:
             outdir:
                 default: "alignment_pipeline"
             directories:
-                source: [gather_alignment/gathered_directory, gather_qc/gathered_directory]
+                source: [gather_alignment/gathered_directory, qc/gathered_results]
                 linkMerge: merge_flattened
         out:
             [gathered_directory]

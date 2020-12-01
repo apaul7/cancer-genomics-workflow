@@ -147,6 +147,8 @@ steps:
         run: ../tools/sort_vcf.cwl
         in:
             vcf: concat_vcf/concat_vcf
+            output_vcf_name:
+                default: "combined.all.gt.sorted.vcf"
         out:
             [sorted_vcf]
     bgzip_index_sorted:
