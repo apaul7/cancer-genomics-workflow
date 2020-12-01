@@ -19,7 +19,7 @@ requirements:
             files="${@:2}"
             mkdir $outdir
             chmod -R 777 $outdir
-            cp --recursive --target-directory $outdir $files
+            cp --recursive --preserve --target-directory $outdir $files
 
             exit 0
 
