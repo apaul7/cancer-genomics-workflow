@@ -61,9 +61,9 @@ inputs:
             valueFrom: |
                 ${
                   if(inputs.contamination_fraction && inputs.contamination_fraction != '-1'){
-                    return "-contamination " + inputs.contamination_fraction;
+                    return inputs.contamination_fraction;
                   } else {
-                    return "";
+                    return null;
                   }
                 }
     max_alternate_alleles:
