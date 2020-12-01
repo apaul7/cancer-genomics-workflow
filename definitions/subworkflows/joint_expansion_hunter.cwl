@@ -55,12 +55,23 @@ steps:
             variant_catalog: variant_catalog
         out:
             [vcf, json, realigned_bam]
+    sample_rename:
+        scatter: [input_vcf, new_sample_name]
+        scatterMethod: dotproduct
+        run: ../tools/replace_vcf_sample_name.cwl
+        in:
+            input_vcf: expansion_hunter/vcf
+            sample_to_replace:
+                default: "final"
+            new_sample_name: sample_names
+        out:
+            [renamed_vcf]
     bgzip_index:
         scatter: [vcf]
         scatterMethod: dotproduct
         run: bgzip_and_index.cwl
         in:
-            vcf: expansion_hunter/vcf
+            vcf: sample_rename/renamed_vcf
         out:
             [indexed_vcf]
     merge:
