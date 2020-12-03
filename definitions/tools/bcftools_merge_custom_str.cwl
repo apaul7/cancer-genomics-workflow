@@ -26,7 +26,7 @@ requirements:
           $VCFS \
           --merge all | \
           sed -e 's/##INFO=<ID=REF,Number=1,Type=Integer,Description="Reference copy number">/##INFO=<ID=REF_CN,Number=1,Type=Integer,Description="Reference copy number">/' \
-          -e "s/\(.*;\)\(REF\)\(=[[:digit:]].*\);/\1REF_CN\3/" | \
+          -e "s/\(.*;\)\(REF\)\(=[[:digit:]].*\)/\1REF_CN\3/" | \
           /opt/bcftools/bin/bcftools view -O z -o merged.expansion_hunter.vcf.gz
 
 inputs:
