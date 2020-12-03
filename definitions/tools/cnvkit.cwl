@@ -23,8 +23,8 @@ requirements:
           REFERENCE_CNN="$3"
           METHOD="$4"
           FILTER="$5"
-          IN_BASENAME=$(basename "$BAM")
-          BASE=$(IN_BASENAME%.*)
+          IN_BASENAME="$(basename $BAM)"
+          BASE="$(IN_BASENAME%.*)"
 
           /usr/bin/python /usr/local/bin/cnvkit.py \
           batch $BAM \
