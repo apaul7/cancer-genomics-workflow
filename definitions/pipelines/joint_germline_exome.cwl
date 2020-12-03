@@ -144,14 +144,14 @@ steps:
                         loadContents: true
             outputs:
                 freemix_score:
-                    type: string?
+                    type: string
             expression: |
                         ${
                             var metrics = inputs.verify_bam_id_metrics.contents.split("\n");
                             if ( metrics[0].split("\t")[6] == 'FREEMIX' ) {
                                 return {'freemix_score': metrics[1].split("\t")[6]};
                             } else {
-                                return {'freemix_score:': null };
+                                return {'freemix_score': -1 };
                             }
                         }
     detect_variants:
