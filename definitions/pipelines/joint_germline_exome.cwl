@@ -93,25 +93,17 @@ inputs:
 
     synonyms_file:
         type: File?
-    annotate_coding_only:
-        type: boolean?
     qc_minimum_mapping_quality:
         type: int?
     qc_minimum_base_quality:
         type: int?
-    vep_custom_annotations:
-        type: ../types/vep_custom_annotation.yml#vep_custom_annotation[]
-        doc: "custom type, check types directory for input format"
-    variants_to_table_fields:
-         type: string[]?
-    variants_to_table_genotype_fields:
-         type: string[]?
-    vep_to_table_fields:
-         type: string[]?
 outputs:
     alignments:
         type: Directory
         outputSource: alignment_and_qc/gathered_results
+    snps:
+        type: Directory
+        outputSource: detect_variants/gathered_results
 steps:
     alignment_and_qc:
         run: ../subworkflows/joint_alignment_exome.cwl
