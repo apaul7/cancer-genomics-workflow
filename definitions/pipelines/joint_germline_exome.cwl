@@ -70,8 +70,6 @@ inputs:
             items:
                 type: array
                 items: string
-    ploidy:
-        type: int?
     vep_cache_dir:
         type:
             - string
@@ -85,9 +83,6 @@ inputs:
     vep_ensembl_species:
         type: string
         doc: "ensembl species - Must be present in the cache directory. Examples: homo_sapiens or mus_musculus"
-    vep_plugins:
-        type: string[]?
-        doc: "array of plugins to use when running vep"
     indel_vep_custom_annotations:
         type: ../types/vep_custom_annotation.yml#vep_custom_annotation[]
         doc: "custom type, check types directory for input format"
@@ -177,22 +172,14 @@ steps:
             emit_reference_confidence: emit_reference_confidence
             gvcf_gq_bands: gvcf_gq_bands
             intervals: intervals
-            #ploidy: ploidy
             contamination_fraction: extract_freemix/freemix_score
             vep_cache_dir: vep_cache_dir
             synonyms_file: synonyms_file
-            #annotate_coding_only: annotate_coding_only
-            #limit_variant_intervals: target_intervals
             vep_ensembl_assembly: vep_ensembl_assembly
             vep_ensembl_version: vep_ensembl_version
             vep_ensembl_species: vep_ensembl_species
-            #vep_plugins: vep_plugins
-            #vep_to_table_fields: vep_to_table_fields
-            #vep_custom_annotations: vep_custom_annotations
             indel_vep_custom_annotations: indel_vep_custom_annotations
             indel_vep_plugins: indel_vep_plugins
             indel_vep_tsv_fields: indel_vep_tsv_fields
-            #variants_to_table_fields: variants_to_table_fields
-            #variants_to_table_genotype_fields: variants_to_table_genotype_fields
         out:
             [gathered_results, raw_vcf, filtered_vcf]
