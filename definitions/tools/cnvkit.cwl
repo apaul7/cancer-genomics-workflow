@@ -23,8 +23,7 @@ requirements:
           REFERENCE_CNN="$3"
           METHOD="$4"
           FILTER="$5"
-          IN_BASENAME="$(basename $BAM)"
-          BASE="$(IN_BASENAME%.*)"
+          BAM_BASE="$6"
 
           /usr/bin/python /usr/local/bin/cnvkit.py \
           batch $BAM \
@@ -32,14 +31,16 @@ requirements:
           --reference $REFERENCE_CNN
 
           /usr/bin/python /usr/local/bin/cnvkit.py call \
-          $BASE.cns -o $SAMPLE.call.cns \
+          $BAM_BASE.cns -o $SAMPLE.call.cns \
           --filter $FILTER
 
           /usr/bin/python /usr/local/bin/cnvkit.py export vcf \
           $SAMPLE.call.cns -i $SAMPLE \
           -o $SAMPLE.cnvkit.vcf
 
-
+arguments: [
+    { position: 6, valueFrom: $(inputs.bam.nameroot) }
+]
 inputs:
     bam:
         type: File
