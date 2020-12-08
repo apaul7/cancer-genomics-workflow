@@ -30,6 +30,8 @@ requirements:
           -m $METHOD \
           --reference $REFERENCE_CNN
 
+          mv $BAM_BASE.cnr $SAMPLE.cnr
+
           /usr/bin/python /usr/local/bin/cnvkit.py call \
           $BAM_BASE.cns -o $SAMPLE.call.cns \
           --filter $FILTER
