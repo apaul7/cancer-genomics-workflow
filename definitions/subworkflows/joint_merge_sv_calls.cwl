@@ -47,7 +47,7 @@ steps:
             estimate_sv_distance: survivor_estimate_distance
             minimum_sv_size: survivor_min_size
             output_name:
-                default: "survivor_merged.vcf"
+                default: "survivor-merged.vcf"
         out:
             [merged_vcf]
     survivor_bgzip:
@@ -64,7 +64,7 @@ steps:
             output_type:
                 default: "z"
             output_vcf_name:
-                default: "bcftools_merged.vcf.gz"
+                default: "bcftools-merged.vcf.gz"
             vcfs:
                 source: [vcfs]
                 valueFrom: | #grouped by samples smoove,manta,cnvnator,cnvkit calls
