@@ -251,6 +251,20 @@ steps:
             annotsv_annotations: annotsv_annotations
         out:
             [tsv, unannotated_tsv, filtered_tsv, filtered_tsv_no_CDS]
+    survivor_add_counts:
+        run: ../tools/annotsv_add_sample_counts.cwl
+        in:
+            sample_count:
+                source: [sample_names]
+                valueFrom: "$(self.length)"
+            caller_count:
+                default: 4
+            annotsv_tsv: annotate_survivor/tsv
+            output_name:
+                source: [cohort_name]
+                valueFrom: "$(self)-survivor-merged.counts.tsv"
+        out:
+            [tsv]
     gather_smoove:
         run: ../tools/gather_to_sub_directory.cwl
         in:
@@ -316,7 +330,7 @@ steps:
             outdir:
                 default: "merged"
             files:
-                source: [merge_calls/survivor, merge_calls/bcftools, annotate_survivor/tsv, annotate_survivor/unannotated_tsv, annotate_survivor/filtered_tsv, annotate_survivor/filtered_tsv_no_CDS, annotate_bcftools/tsv, annotate_bcftools/unannotated_tsv, annotate_bcftools/filtered_tsv, annotate_bcftools/filtered_tsv_no_CDS]
+                source: [merge_calls/survivor, merge_calls/bcftools, survivor_add_counts/tsv, annotate_survivor/unannotated_tsv, annotate_survivor/filtered_tsv, annotate_survivor/filtered_tsv_no_CDS, annotate_bcftools/tsv, annotate_bcftools/unannotated_tsv, annotate_bcftools/filtered_tsv, annotate_bcftools/filtered_tsv_no_CDS]
                 linkMerge: merge_flattened
         out:
             [gathered_directory]
