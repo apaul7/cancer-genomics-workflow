@@ -245,8 +245,8 @@ steps:
             sv_vcf: merge_calls/bcftools
             snps_vcf: snps_vcf
             tsv_base:
-                default: "bcftools-merged"
-## add family/cohort name?
+                source: [cohort_name]
+                valueFrom: "$(self)-bcftools-merged"
             genome_build: genome_build
             annotsv_annotations: annotsv_annotations
         out:
