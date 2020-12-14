@@ -9,7 +9,7 @@ requirements:
     - class: DockerRequirement
       dockerPull: "griffithlab/vatools:3.1.0"
     - class: ResourceRequirement
-      ramMin: 4000
+      ramMin: 20000
 arguments:
     ["-o", { valueFrom: $(runtime.outdir)/$(inputs.prefix) }]
 inputs:
@@ -30,7 +30,7 @@ inputs:
             prefix: "-t"
     prefix:
         type: string?
-        default: 'variants'
+        default: 'variants.tsv'
 outputs:
     annotated_variants_tsv:
         type: File
