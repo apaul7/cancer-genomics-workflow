@@ -75,7 +75,7 @@ steps:
         run: ../tools/sort_vcf.cwl
         in:
             vcf: run_concat/concat_vcf
-            prefix:
+            output_vcf_name:
                 default: "combined.all.gt.vt.filtered.vcf"
         out:
             [sorted_vcf]
