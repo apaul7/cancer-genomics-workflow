@@ -23,6 +23,9 @@ inputs:
         type:
             - string
             - Directory
+    survivor_merged:
+        type: boolean
+        default: false
 outputs:
     tsv:
         type: File
@@ -60,6 +63,7 @@ steps:
             output_tsv_name:
                 source: tsv_base
                 valueFrom: "$(self + '.filtered-noCDS.AnnotSV.tsv')"
+            survivor_merged: survivor_merged
         out:
             [filtered_tsv]
     filter:
@@ -73,6 +77,7 @@ steps:
             output_tsv_name:
                 source: tsv_base
                 valueFrom: "$(self + '.filtered.AnnotSV.tsv')"
+            survivor_merged: survivor_merged
         out:
             [filtered_tsv]
 

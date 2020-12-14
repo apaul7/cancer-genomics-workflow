@@ -263,6 +263,8 @@ steps:
             output_name:
                 source: [cohort_name]
                 valueFrom: "$(self)-survivor-merged.counts.tsv"
+            survivor_merged:
+                default: true
         out:
             [tsv]
     gather_smoove:
