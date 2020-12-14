@@ -54,13 +54,17 @@ requirements:
             # column names for callers currently follow $CALLER-$SAMPLE format
             for x in range(filter_index+2, filter_index+2 + sample_count*caller_count):
                 name = in_column_names[x]
-                caller = name.split("-")[0]
+                split_array = name.split("-")
+                num_elements = len(split_array)
+                caller = split_array[num_elements-1] # last element
+
                 if not(caller in caller_names):
                     caller_names.append(caller)
-                sample = name.replace(caller+"-","") # may not be the best. will replace all instances. sample name may include "$CALLER"-
+
+                sample = "-".join(split_array[0:(num_elements-1)])
                 if not(sample in sample_names):
                     sample_names.append(sample)
-            
+
             print(caller_names)
             print(sample_names)
             
