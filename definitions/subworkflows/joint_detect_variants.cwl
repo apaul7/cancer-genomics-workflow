@@ -128,6 +128,10 @@ outputs:
     str_results:
         type: Directory
         outputSource: joint_strs/gathered_results
+    filtered_snps_vcf:
+        type: File
+        secondaryFiles: [.tbi]
+        outputSource: joint_snps/filtered_vcf
 
 steps:
     joint_snps:
