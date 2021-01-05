@@ -262,7 +262,7 @@ steps:
             annotsv_tsv: annotate_survivor/tsv
             output_name:
                 source: [cohort_name]
-                valueFrom: "$(self)-survivor-merged.counts.tsv"
+                valueFrom: "$(self)-survivor-merged.filtered.AnnotSV.counts.tsv"
             survivor_merged:
                 default: true
         out:
