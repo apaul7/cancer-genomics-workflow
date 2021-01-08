@@ -20,14 +20,19 @@ requirements:
 
           # set vars
           VCFS="$@"
-
-          # merges input VCFS, changes tag `REF` to `REF_CN` allowing field to be used in output TSV in future steps
-          /opt/bcftools/bin/bcftools merge \
-          $VCFS \
-          --merge all | \
-          sed -e 's/##INFO=<ID=REF,Number=1,Type=Integer,Description="Reference copy number">/##INFO=<ID=REF_CN,Number=1,Type=Integer,Description="Reference copy number">/' \
-          -e "s/\(.*;\)\(REF\)\(=[[:digit:]].*\)/\1REF_CN\3/" | \
-          /opt/bcftools/bin/bcftools view -O z -o merged.expansion_hunter.vcf.gz
+          LEN="${#@}"
+          # if more than 1 vcf merge, then change tag `REF` to `REF_CN` allowing field to be used in output TSV in future steps
+          if [ $LEN == "1" ]; then
+              /opt/bcftools/bin/bcftools view $VCFS | \
+              sed -e 's/##INFO=<ID=REF,Number=1,Type=Integer,Description="Reference copy number">/##INFO=<ID=REF_CN,Number=1,Type=Integer,Description="Reference copy number">/' \
+              -e "s/\(.*;\)\(REF\)\(=[[:digit:]].*\)/\1REF_CN\3/" | \
+              /opt/bcftools/bin/bcftools view -O z -o merged.expansion_hunter.vcf.gz
+          else
+              /opt/bcftools/bin/bcftools merge $VCFS --merge all | \
+              sed -e 's/##INFO=<ID=REF,Number=1,Type=Integer,Description="Reference copy number">/##INFO=<ID=REF_CN,Number=1,Type=Integer,Description="Reference copy number">/' \
+              -e "s/\(.*;\)\(REF\)\(=[[:digit:]].*\)/\1REF_CN\3/" | \
+              /opt/bcftools/bin/bcftools view -O z -o merged.expansion_hunter.vcf.gz
+          fi
 
 inputs:
     vcfs:
