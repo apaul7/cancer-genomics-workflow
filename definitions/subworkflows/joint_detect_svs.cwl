@@ -259,7 +259,7 @@ steps:
                 valueFrom: "$(self.length)"
             caller_count:
                 default: 4
-            annotsv_tsv: annotate_survivor/tsv
+            annotsv_tsv: annotate_survivor/filtered_tsv
             output_name:
                 source: [cohort_name]
                 valueFrom: "$(self)-survivor-merged.filtered.AnnotSV.counts.tsv"
