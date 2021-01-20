@@ -2,14 +2,34 @@
 
 cwlVersion: v1.0
 class: CommandLineTool
-
-baseCommand: ["/opt/bcftools/bin/bcftools", "merge"]
+label: "custom bcftools, merges if multiple inputs, otherwise pass out same vcf"
+baseCommand: ["/bin/bash", "run_merge.sh"]
 
 requirements:
     - class: ResourceRequirement
       ramMin: 4000
     - class: DockerRequirement
       dockerPull: "mgibio/bcftools-cwl:1.9"
+    - class: InitialWorkDirRequirement
+      listing:
+      - entryname: "run_merge.sh"
+        entry: |-
+          #!/bin/bash
+          set -eou pipefail
+          inputs=\$@
+          vcfs=\$(echo \$inputs | tr ' ' '\\n' | grep 'vcf.gz$')
+          count=\$(echo \$vcfs | tr ' ' '\\n' | wc -l)
+          output_vcf=\$(echo \$vcfs | tr ' ' '\\n' | head -1)
+          last_vcf=\$(echo \$vcfs | tr ' ' '\\n' | tail -1)
+          if [ \$count == 2 ]; then
+              # 1 vcf is output file, 1 vcf input.
+              # bcftools merge complains if only 1 sample input. pass input vcf to output vcf
+              cp \$last_vcf \$output_vcf
+          else
+              /opt/bcftools/bin/bcftools merge \$inputs
+          fi
+          exit 0
+
 
 inputs:
     force_merge:
