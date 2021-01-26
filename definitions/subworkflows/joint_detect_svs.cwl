@@ -237,6 +237,8 @@ steps:
                 valueFrom: "$(self)-survivor-merged"
             genome_build: genome_build
             annotsv_annotations: annotsv_annotations
+            survivor_merged:
+                default: true
         out:
             [tsv, unannotated_tsv, filtered_tsv, filtered_tsv_no_CDS]
     annotate_bcftools:
@@ -249,6 +251,8 @@ steps:
                 valueFrom: "$(self)-bcftools-merged"
             genome_build: genome_build
             annotsv_annotations: annotsv_annotations
+            survivor_merged:
+                default: false
         out:
             [tsv, unannotated_tsv, filtered_tsv, filtered_tsv_no_CDS]
     survivor_add_counts:
@@ -263,8 +267,6 @@ steps:
             output_name:
                 source: [cohort_name]
                 valueFrom: "$(self)-survivor-merged.filtered.AnnotSV.counts.tsv"
-            survivor_merged:
-                default: true
         out:
             [tsv]
     survivor_add_counts_no_cds:
@@ -279,8 +281,6 @@ steps:
             output_name:
                 source: [cohort_name]
                 valueFrom: "$(self)-survivor-merged.filtered-noCDS.AnnotSV.counts.tsv"
-            survivor_merged:
-                default: true
         out:
             [tsv]
     gather_smoove:
