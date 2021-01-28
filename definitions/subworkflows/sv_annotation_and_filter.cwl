@@ -56,7 +56,7 @@ steps:
         run: ../tools/annotsv_filter.cwl
         in:
             all_CDS:
-                default: false
+                default: true
             annotsv_tsv: annotsv/annotated_tsv
             filtering_frequency:
                 default: 0.05
