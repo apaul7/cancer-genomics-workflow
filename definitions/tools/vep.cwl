@@ -11,7 +11,7 @@ requirements:
           - $import: ../types/vep_custom_annotation.yml
     - class: ResourceRequirement
       coresMin: 4
-      ramMin: 64000
+      ramMin: 94000
       tmpdirMin: 25000
     - class: DockerRequirement
       dockerPull: "mgibio/vep_helper-cwl:1.1.0"
