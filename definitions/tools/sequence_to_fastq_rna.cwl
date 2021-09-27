@@ -42,10 +42,10 @@ requirements:
             done
 
             if [[ "$MODE" == 'fastq' ]]; then #must be fastq input
-                # cp $FASTQ1 $OUTDIR/read.1.fastq
-                # cp $FASTQ2 $OUTDIR/read.2.fastq
-                gunzip -c $FASTQ1 > $OUTDIR/read1.fastq
-                gunzip -c $FASTQ2 > $OUTDIR/read2.fastq
+                cp $FASTQ1 $OUTDIR/read1.fastq
+                cp $FASTQ2 $OUTDIR/read2.fastq
+                #gunzip -c $FASTQ1 > $OUTDIR/read1.fastq
+                #gunzip -c $FASTQ2 > $OUTDIR/read2.fastq
             else # then
                 ##run samtofastq here, dumping to the same filenames
                 ## input file is $BAM
@@ -68,11 +68,12 @@ inputs:
         inputBinding:
             prefix: '-2'
 outputs:
-    fastqW1:
+    fastq1:
         type: File?
         outputBinding:
             glob: "read1.fastq"
-    fastqW2:
+    fastq2:
         type: File?
         outputBinding:
             glob: "read2.fastq"
+
