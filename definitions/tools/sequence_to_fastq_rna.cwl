@@ -76,4 +76,3 @@ outputs:
         type: File?
         outputBinding:
             glob: "read2.fastq"
-
