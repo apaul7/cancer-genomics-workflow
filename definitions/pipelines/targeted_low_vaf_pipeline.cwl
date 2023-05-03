@@ -170,6 +170,10 @@ outputs:
     verify_bam_id_depth:
         type: File
         outputSource: alignment_and_qc/verify_bam_id_depth
+    mutect_vcf:
+        type: File
+        outputSource: detect_variants/mutect_vcf
+        secondaryFiles: [.tbi]
     varscan_vcf:
         type: File
         outputSource: detect_variants/varscan_vcf
@@ -251,7 +255,7 @@ steps:
             readcount_minimum_mapping_quality: readcount_minimum_mapping_quality
             readcount_minimum_base_quality: readcount_minimum_base_quality
         out:
-            [varscan_vcf, docm_gatk_vcf, annotated_vcf, final_vcf, final_tsv, vep_summary, tumor_snv_bam_readcount_tsv, tumor_indel_bam_readcount_tsv]
+            [mutect_vcf, varscan_vcf, docm_gatk_vcf, annotated_vcf, final_vcf, final_tsv, vep_summary, tumor_snv_bam_readcount_tsv, tumor_indel_bam_readcount_tsv]
     bam_to_cram:
         run: ../tools/bam_to_cram.cwl
         in:

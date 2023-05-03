@@ -91,6 +91,10 @@ inputs:
         type: int
         default: 50
 outputs:
+    mutect_vcf:
+        type: File
+        outputSource: mutect/unfiltered_vcf
+        secondaryFiles: [.tbi]
     varscan_vcf:
         type: File
         outputSource: varscan/unfiltered_vcf
