@@ -27,6 +27,10 @@ inputs:
         secondaryFiles: [.tbi]
     sv_exclude_regions:
         type: File
+    manta_call_regions:
+        type: File?
+        secondaryFiles: [.tbi]
+        doc: "bgzip-compressed, tabix-indexed BED file specifiying regions to which variant analysis will be restricted"
     cnvkit_reference_cnn:
         type: File
         doc: "can be a flat reference or reference based on a set of panel of normals"
@@ -92,6 +96,7 @@ steps:
         in:
             bams: bams
             reference: reference
+            call_regions: manta_call_regions
             output_contigs:
                 default: true
         out:

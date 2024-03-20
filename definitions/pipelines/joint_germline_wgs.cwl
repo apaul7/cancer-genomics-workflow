@@ -99,6 +99,10 @@ inputs:
 
     sv_exclude_regions:
         type: File
+    sv_manta_call_regions:
+        type: File?
+        secondaryFiles: [.tbi]
+        doc: "bgzip-compressed, tabix-indexed BED file specifiying regions to which variant analysis will be restricted"
     cnvkit_reference_cnn:
         type: File
         doc: "can be a flat reference or reference based on a set of panel of normals"
@@ -233,6 +237,7 @@ steps:
             indel_vep_plugins: indel_vep_plugins
             indel_vep_tsv_fields: indel_vep_tsv_fields
             sv_exclude_regions: sv_exclude_regions
+            sv_manta_call_regions: sv_manta_call_regions
             cnvkit_reference_cnn: cnvkit_reference_cnn
             sv_filter_del_depth: sv_filter_del_depth
             sv_filter_dup_depth: sv_filter_dup_depth
