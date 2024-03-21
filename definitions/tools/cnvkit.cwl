@@ -5,7 +5,7 @@ class: CommandLineTool
 baseCommand: ["/bin/bash", "run_cnvkit.sh"]
 requirements:
     - class: DockerRequirement
-      dockerPull: "etal/cnvkit:0.9.5"
+      dockerPull: "etal/cnvkit:0.9.10"
     - class: ResourceRequirement
       coresMin: 1
       ramMin: 4000
