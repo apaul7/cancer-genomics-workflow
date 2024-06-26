@@ -6,7 +6,7 @@ label: "run vt"
 baseCommand: ["/bin/bash", "run_vt_normalize.sh"]
 requirements:
     - class: DockerRequirement
-      dockerPull: quay.io/biocontainers/vt:0.57721--hf74b74d_1
+      dockerPull: quay.io/biocontainers/vt:0.57721--h064f3d2_11
     - class: ResourceRequirement
       ramMin: 4000
     - class: InitialWorkDirRequirement
