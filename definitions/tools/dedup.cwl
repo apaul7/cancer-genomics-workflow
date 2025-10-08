@@ -8,7 +8,7 @@ baseCommand: ["/usr/local/bin/umi_tools", "dedup"]
 
 requirements:
     - class: ResourceRequirement
-      ramMin: 10000
+      ramMin: 50000
     - class: DockerRequirement
       dockerPull: "apaul7/analysis:1.1.0"
 
