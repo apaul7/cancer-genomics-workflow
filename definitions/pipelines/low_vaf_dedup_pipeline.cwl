@@ -102,6 +102,9 @@ inputs:
             - "null"
             - type: enum
               symbols: ["pick", "flag_pick", "pick_allele", "per_gene", "pick_allele_gene", "flag_pick_allele", "flag_pick_allele_gene"]
+    vep_plugins:
+        type: string[]
+        default: [Frameshift, Wildtype]
     variants_to_table_fields:
         type: string[]?
         default: [CHROM,POS,REF,ALT,set]
@@ -297,6 +300,7 @@ steps:
             vep_ensembl_species: vep_ensembl_species
             synonyms_file: synonyms_file
             vep_pick: vep_pick
+            vep_plugins: vep_plugins
             variants_to_table_fields: variants_to_table_fields
             variants_to_table_genotype_fields: variants_to_table_genotype_fields
             vep_to_table_fields: vep_to_table_fields
